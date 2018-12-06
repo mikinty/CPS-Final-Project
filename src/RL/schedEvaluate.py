@@ -11,9 +11,9 @@ def schedulerEvaluate(scheduler):
     '''
     Trains the scheduler via RL
 
-    :param scheduler: The scheduler we are trying to train
+    param scheduler: The scheduler we are trying to train
 
-    :return: New quality estimates for each state
+    return: New quality estimates for each state
     '''
     for i in range(SCHEDULER_TRAIN_ITER):
         '''
@@ -39,15 +39,17 @@ def schedulerEvaluate(scheduler):
 
             R[(state, action)][index] += 1
 
-    '''
-    Don't think this is needed for now
-
     # Update scheduler quality estimates
     # Notice that if we didn't encounter a particular state in 
     # our random paths, then scheduler will retain its old value
-    for key in R:
-        Q[key] = (R[key][1] / (R[key][0] + R[key][1]))
-    '''
+    Q = {}
 
-    return R
+    for state, action in R:
+        total = (R[(state, action)][0] + R[(state, action)][1])
 
+        if total == 0:
+            Q[state][action] = 0
+        else:
+            Q[state][action] = (R[(state, action)][1] / total)
+
+    return Q
