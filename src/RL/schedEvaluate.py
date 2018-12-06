@@ -5,15 +5,15 @@ Michael You
 Abhishek Barghava
 '''
 
-from CONSTANTS_RL import *
+from CONSTANTS_RL import SCHEDULER_TRAIN_ITER
 
-def schedulerTrain(scheduler):
+def schedulerEvaluate(scheduler):
     '''
     Trains the scheduler via RL
 
     :param scheduler: The scheduler we are trying to train
 
-    :return: None, modifies scheduler with new quality estimates
+    :return: New quality estimates for each state
     '''
     for i in range(SCHEDULER_TRAIN_ITER):
         '''
@@ -39,9 +39,15 @@ def schedulerTrain(scheduler):
 
             R[(state, action)][index] += 1
 
+    '''
+    Don't think this is needed for now
+
     # Update scheduler quality estimates
     # Notice that if we didn't encounter a particular state in 
     # our random paths, then scheduler will retain its old value
     for key in R:
-        scheduler[key] = (R[key][1] / (R[key][0] + R[key][1]))
+        Q[key] = (R[key][1] / (R[key][0] + R[key][1]))
+    '''
+
+    return R
 
