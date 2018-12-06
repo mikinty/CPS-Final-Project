@@ -1,7 +1,9 @@
-# This file contains the scheduler evaluation code
-#
-# Michael You
-# Abhishek Barghava
+'''
+Scheduler Evaluation 
+
+Michael You
+Abhishek Barghava
+'''
 
 from CONSTANTS_RL import *
 
@@ -22,6 +24,7 @@ def schedulerTrain(scheduler):
         success: Bool
                  whether we ended up in a success state (True or False)
         '''
+        # TODO: need code to simulate the MDP path
         # is this a random path?
         path, success = sim()
 
@@ -37,6 +40,8 @@ def schedulerTrain(scheduler):
             R[(state, action)][index] += 1
 
     # Update scheduler quality estimates
+    # Notice that if we didn't encounter a particular state in 
+    # our random paths, then scheduler will retain its old value
     for key in R:
         scheduler[key] = (R[key][1] / (R[key][0] + R[key][1]))
 
