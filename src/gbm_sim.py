@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import random
 
 # data file
-DATA_FILE = os.path.expanduser("~/College/Junior/15424_Foundations/Project/data/")
+DATA_FILE = os.path.expanduser("./data/")
 
 # number of trading days in a year
 # this is what annualized volatility is based on
