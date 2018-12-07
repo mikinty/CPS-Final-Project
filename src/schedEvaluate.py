@@ -11,18 +11,18 @@ from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES
 from numpy import array, zeros, random, divide, zeros
 import multiprocessing as mp
 from functools import partial
+from time import time
 
 from simulation import simulate_driver
 
-
 # Per thread call to orun a single simulation iteration
-def callSimulation(i):
-    global tempSched 
+def callSimulation(scheduler, i):
+    random.seed()
 
     # generate moves
     moves = [random.randint(NUM_WORLD_STATES)]
     for i in range(NUMBER_OF_PERIODS - 1):
-        moves.append(random.choice([0, 1, 2, 3], p=tempSched[moves[i]]))
+        moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
 
     # Run simulation
     avg_return, risk, sharpe = simulate_driver(moves)
@@ -43,7 +43,6 @@ def callSimulation(i):
     return R
 
 def schedulerEvaluate(scheduler):
-    global tempSched 
     '''
     Trains the scheduler via RL
 
@@ -51,14 +50,17 @@ def schedulerEvaluate(scheduler):
 
     return: New quality estimates for each state
     '''
-    tempSched = scheduler
     # number of jobs
-    # jobs = range(SCHEDULER_TRAIN_ITER)
+    jobs = range(SCHEDULER_TRAIN_ITER)
 
-    # CS = partial(callSimulation, scheduler)
+    CS = partial(callSimulation, scheduler)
 
-    # pool = mp.Pool()
-    # R_RES = pool.map(callSimulation, jobs)
+    pool = mp.Pool()
+    R_RES = pool.map(CS, jobs)
+    # print(R_RES)
+    R = sum(R_RES)
+
+    '''
     R = callSimulation(0)
     for x in range(SCHEDULER_TRAIN_ITER):
         R_RES = callSimulation(x)
@@ -67,6 +69,7 @@ def schedulerEvaluate(scheduler):
         R += R_RES
 
     print(R)
+    '''
 
     # Update scheduler quality estimates
     # Notice that if we didn't encounter a particular state in 

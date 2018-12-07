@@ -9,13 +9,13 @@ Abhishek Barghava
 SCHEDULER_OPTIMIZE_ITER = 100
 
 # Number of iterations to train the scheduler
-SCHEDULER_TRAIN_ITER = 50
+SCHEDULER_TRAIN_ITER = 100
 
 # How much exploration we do during RL
 EXPLORATION_RATE = 0.05
 
 # How fast we are learning new choices
-LEARNING_RATE = 0.5
+LEARNING_RATE = 0.2
 
 # Number of world states
 NUM_WORLD_STATES = 4
