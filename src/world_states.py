@@ -1,15 +1,10 @@
-import numpy
-import math
 import os
 import pandas
 import numpy
 import datetime
-import matplotlib.pyplot as plt
-import random
 import queue
 import time
 import pickle
-import copy
 
 from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, WINDOW_SIZE, STOCKS, \
     PARAMS_FNAME, RETURNS_FNAME

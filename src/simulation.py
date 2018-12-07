@@ -1,13 +1,5 @@
-import numpy
 import math
-import os
-import pandas
 import numpy
-import datetime
-import matplotlib.pyplot as plt
-import random
-import queue
-import time
 import pickle
 import copy
 
@@ -15,23 +7,16 @@ from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS
     PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE
 
 # simulate correlated gbms
-def simulate(mean, sigma, initial, raw_prices_dict):
+def simulate(mean, sigma, initial):
 
     # get the cholesky factorization
     cholesky = numpy.linalg.cholesky(sigma)
 
     curr_prices = copy.deepcopy(initial)
-    prices_dict = copy.deepcopy(raw_prices_dict)
 
     num_stocks = len(mean)
     t = float(1.0) / float(YEAR_LENGTH)
     sqrt_t = math.sqrt(t)
-
-    # prices dictionary
-    if prices_dict is None:
-        prices_dict = dict()
-        for i in range(num_stocks):
-            prices_dict[i] = list()
 
     # iterate and simulate the correlated GBMs
     for i in range(TRANSITION_PERIOD):
@@ -55,12 +40,11 @@ def simulate(mean, sigma, initial, raw_prices_dict):
             new_price = curr_price * math.exp(exponent)
 
             curr_prices[j] = new_price
-            prices_dict[j].append(new_price)
 
-    return curr_prices, prices_dict
+    return curr_prices
 
 def simulate_driver_scheme1(state_num, init_prices, num_iterations,
-                            mean, sigma, prices_dict):
+                            mean, sigma):
     '''
     :param state_num: State number
     :param prices: Initial prices
@@ -73,7 +57,7 @@ def simulate_driver_scheme1(state_num, init_prices, num_iterations,
     new_prices = numpy.zeros(len(init_prices))
 
     for i in range(num_iterations):
-        curr_prices, prices_dict = simulate(mean, sigma, init_local, prices_dict)
+        curr_prices = simulate(mean, sigma, init_local)
 
         new_prices = numpy.add(curr_prices, new_prices)
 
@@ -81,7 +65,7 @@ def simulate_driver_scheme1(state_num, init_prices, num_iterations,
 
     # don't average over path, but this is fine - we don't need this functionality
 
-    return avg_prices, prices_dict
+    return avg_prices
 
 
 def simulate_driver(transitions):
@@ -105,19 +89,7 @@ def simulate_driver(transitions):
     prev_state = None
     curr_prices = [100.0] * len(means[0])
 
-    # initialize prices dictionary
-    prices_dict = dict()
-    long_prices = dict()
-    returns_dict = dict()
-
     num_stocks = len(means[0])
-
-    for i in range(num_stocks):
-        prices_dict[i] = list()
-        long_prices[i] = list()
-        long_prices[i].append(100.0)
-        returns_dict[i] = list()
-
 
     portfolio_returns = list()
 
@@ -134,17 +106,14 @@ def simulate_driver(transitions):
         mean = means[transition]
         sigma = sigmas[transition]
 
-        curr_prices, prices_dict = simulate_driver_scheme1(transition, curr_prices,
+        curr_prices = simulate_driver_scheme1(transition, curr_prices,
                                                            num_iterations=3,
-                                                           mean=mean, sigma=sigma,
-                                                           prices_dict=prices_dict)
+                                                           mean=mean, sigma=sigma)
 
         curr_returns = list()
 
         for i in range(num_stocks):
-            long_prices[i].append(curr_prices[i])
             curr_stock_ret = math.log(curr_prices[i]) - math.log(prev_prices[i])
-            returns_dict[i].append(curr_stock_ret)
             curr_returns.append(curr_stock_ret)
 
         curr_returns = numpy.array(curr_returns)
@@ -160,4 +129,3 @@ def simulate_driver(transitions):
     sharpe = avg_return / risk
 
     return avg_return, risk, sharpe
-
