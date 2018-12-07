@@ -12,8 +12,13 @@ import pickle
 import copy
 import cvxopt
 from cvxopt import blas, solvers
+import scipy.optimize as sco
 
-from .world_states import get_returns_df
+from CONSTANTS_MAIN import PARAMS_FNAME, PORTFOLIO_FNAME, NUM_WORLD_STATES, \
+                WORLD_STATE_TRANSITION, RETURNS_FNAME, RISK_FREE_RATE, \
+                RF_INVESTMENT, TRADER_WORLD_STATE_TRANSITION
+
+from world_states import get_returns_df
 
 
 def optimal_portfolio(returns):
@@ -49,30 +54,93 @@ def optimal_portfolio(returns):
     wt = solvers.qp(cvxopt.matrix(x1 * S), -pbar, G, h, A, b)['x']
     return numpy.asarray(wt), returns, risks
 
-def optimal_portfolio_for_state(mean, sigma):
+def portfolio_annualised_performance(weights, mean_returns, cov_matrix):
+    returns = numpy.sum(mean_returns*weights ) *252
+    std = numpy.sqrt(numpy.dot(weights.T, numpy.dot(cov_matrix, weights))) * numpy.sqrt(252)
+    return std, returns
+
+def neg_sharpe_ratio(weights, mean_returns, cov_matrix, risk_free_rate):
+    p_var, p_ret = portfolio_annualised_performance(weights, mean_returns, cov_matrix)
+    return -(p_ret - risk_free_rate) / p_var
+
+def max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix, risk_free_rate)
+    constraints = ({'type': 'eq', 'fun': lambda x: numpy.sum(x) - 1})
+    bound = (-1.0,1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+    result = sco.minimize(neg_sharpe_ratio, num_assets*[1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
+
+def optimal_portfolio_for_state(mean, sigma, rf_prop):
+    #w, _, _ = optimal_portfolio(returns)
+    mean = copy.deepcopy(mean)
+    sigma = copy.deepcopy(sigma)
+    alpha_star = numpy.matmul(numpy.linalg.inv(sigma), mean)
+    alpha_star = numpy.divide(alpha_star, sum(alpha_star))
+    alpha_star = numpy.multiply(alpha_star, (1.0-rf_prop))
+
+    return alpha_star
 
 
 
 # gets optimal portfolio assuming knowledge of state, for next potential states
-def get_optimal_portfolio(state_num, fname):
+def save_optimal_portfolios():
 
-    pickle_in = open(fname, 'rb')
+
+    pickle_in = open(PARAMS_FNAME, 'rb')
     params = pickle.load(pickle_in)
+    pickle_in.close()
+
+    pickle_in = open(RETURNS_FNAME, 'rb')
+    returns = pickle.load(pickle_in)
     pickle_in.close()
 
     means = params[0]
     sigmas = params[1]
 
-    # get mean and sigma
-    mean = means[state_num]
-    sigma = sigmas[state_num]
+    optimal_ports = dict()
+    real_ports = dict()
 
-    # get indices of possible transitions
+    rf = RF_INVESTMENT
+    ts = TRADER_WORLD_STATE_TRANSITION
+
+    for state_num in range(NUM_WORLD_STATES):
+        optimal_ports[state_num] = optimal_portfolio_for_state(means[state_num],
+                                                               sigmas[state_num],
+                                                               rf[state_num])
+
+    for state_num in range(NUM_WORLD_STATES):
+
+        # get mean and sigma
+        mean = means[state_num]
+        sigma = sigmas[state_num]
+
+        # get indices of possible transitions
+        curr_row = WORLD_STATE_TRANSITION[state_num,:]
+
+        curr_portfolio = numpy.zeros(len(mean))
+
+        num_possible_transitions = 0
+
+        for i in range(len(curr_row)):
+            # if we can't transition ignore this state
+            if (curr_row[i] == 0):
+                continue
+
+            curr_add = numpy.multiply(optimal_ports[i], ts[state_num, i])
+            curr_portfolio = numpy.add(curr_portfolio, curr_add)
+
+        real_ports[state_num] = curr_portfolio
+
+    opts = (real_ports, optimal_ports)
+
+    # save
+    pickle_out = open(PORTFOLIO_FNAME, 'wb')
+    pickle.dump(opts, pickle_out)
+    pickle_out.close()
 
 
-    #weights, returns, risks = cvxoptimal_portfolio(return_vec)
+save_optimal_portfolios()
 
-    #plt.plot(stds, means, 'o')
-    #plt.ylabel('mean')
-    #plt.xlabel('std')
-    #plt.plot(risks, returns, 'y-o')
