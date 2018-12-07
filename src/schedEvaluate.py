@@ -6,9 +6,9 @@ Abhishek Barghava
 '''
 
 from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD
-from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES
+from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES, EXPLORATION_CHOICE
 
-from numpy import array, array_equal, zeros, random, divide, zeros
+from numpy import array, array_equal, zeros, random, divide, nonzero, newaxis
 import multiprocessing as mp
 from functools import partial
 from time import time
@@ -23,7 +23,10 @@ def callSimulation(scheduler, strat, i):
     # generate moves
     moves = [random.randint(NUM_WORLD_STATES)]
     for i in range(NUMBER_OF_PERIODS - 1):
-        moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
+        if random.random() < EXPLORATION_CHOICE:
+            moves.append(random.choice(nonzero(scheduler[moves[i]])[0]))
+        else:
+            moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
 
     # Run simulation
     avg_return, risk, sharpe = simulate_driver(moves, strat)
@@ -47,6 +50,12 @@ def callSimulation(scheduler, strat, i):
 
         R[index][state][action] += sharpe
 
+    '''
+    row_sums = R[index].sum(axis=1)
+    R[index] = divide(R[index], row_sums[:, newaxis], where=row_sums[:, newaxis] != 0)
+    R[index] = R[index] * sharpe
+    '''
+
     return R
 
 def schedulerEvaluate(scheduler, strat):
@@ -58,6 +67,7 @@ def schedulerEvaluate(scheduler, strat):
     return: New quality estimates for each state
     '''
 
+    '''
     # parallel version...idk why it doesn't work
     pool = mp.Pool()
     # number of jobs
@@ -70,8 +80,8 @@ def schedulerEvaluate(scheduler, strat):
     R = sum(R_RES)
 
     pool.close()
-
     '''
+
     # sequential version
     R = callSimulation(scheduler, strat, 0)
     print(strat)
@@ -79,10 +89,10 @@ def schedulerEvaluate(scheduler, strat):
         R_RES = callSimulation(scheduler, strat, x)
 
         # print(R_RES)
-        R += R_RES
-    
-    print(R)
-    '''
+        R += R_RES    
+
+    print (R)
+
     # print(sum(sum(sum(R))))
 
     # Update scheduler quality estimates

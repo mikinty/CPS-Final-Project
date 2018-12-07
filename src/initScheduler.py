@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     print('Creating scheduler matrix', SCHEDULER_FILE)
 
-    ''' uniform
+    # ''' uniform
     scheduler = np.array([[0.5, 0, 0.5, 0],
                           [0.25, 0.25, 0.25, 0.25],
                           [0.25, 0.25, 0.25, 0.25],
@@ -29,6 +29,7 @@ if __name__ == '__main__':
                           [0.1, 0.1, 0.4, 0.4],
                           [0, 0.1, 0, 0.9]])
     
+    '''
 
     pickle_out = open(SCHEDULER_FILE, 'wb')
     pickle.dump(scheduler, pickle_out)

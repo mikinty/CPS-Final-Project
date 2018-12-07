@@ -31,6 +31,13 @@ if __name__ == '__main__':
     scheduler = pickle.load(pickle_in)
     pickle_in.close()
 
+
+    cheduler = array([[0, 0, 1,   0], 
+                       [0, 0, 0.5, 0.5],
+                       [0, 0, 0.5, 0.5 ],
+                       [0, 0, 0,   1]])
+
+
     win = 0
     total = 0
     for x in range(100):
