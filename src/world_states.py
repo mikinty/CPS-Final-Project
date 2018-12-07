@@ -187,44 +187,6 @@ def get_state_params(state_returns):
     return means, sigmas
 
 
-# simulate correlated gbms
-def simulate(mean, sigma, time_pd, initial):
-
-    # get the cholesky factorization
-    cholesky = numpy.linalg.cholesky(sigma)
-
-    curr_prices = copy.deepcopy(initial)
-
-    num_stocks = len(mean)
-    t = float(1.0) / float(YEAR_LENGTH)
-    sqrt_t = math.sqrt(t)
-
-    # iterate and simulate the correlated GBMs
-    for i in range(time_pd):
-
-        # get the random vector for this time step
-        zs = numpy.random.normal(0.0, 1.0, num_stocks)
-
-        for j in range(num_stocks):
-
-            # get the current price of the stock
-            curr_price = curr_prices[j]
-            curr_mean = mean[j]
-            curr_sigma_sq = sigma[j,j]
-
-            # get row i of the cholesky matrix
-            curr_row = cholesky[j,:]
-
-            # compute the thing in the exponent
-            exponent = (sqrt_t * (numpy.dot(curr_row, zs))) + ((curr_mean - (0.5*curr_sigma_sq))*t)
-
-            new_price = curr_price * math.exp(exponent)
-
-            curr_prices[j] = new_price
-
-    return curr_prices
-
-
 # helper, takes all params as args
 def scheme1_driver_helper(transition_period, window_size, stocks, fname):
     # get the dates for the states
@@ -258,28 +220,6 @@ def scheme1_driver_helper(transition_period, window_size, stocks, fname):
     pickle.dump(parameters, pickle_out)
     pickle_out.close()
 
-def simulate_driver(transition_period, fname, state_num, prices,
-                    num_iterations):
-
-    pickle_in = open(fname, 'rb')
-    params = pickle.load(pickle_in)
-    pickle_in.close()
-
-    means = params[0]
-    sigmas = params[1]
-
-    new_prices = numpy.zeros(prices.shape)
-
-    for i in range(num_iterations):
-        curr_prices = simulate(means[state_num], sigmas[state_num],
-                               transition_period, prices)
-
-        new_prices = numpy.add(curr_prices, new_prices)
-
-
-    avg_prices = numpy.divide(new_prices, num_iterations)
-    return avg_prices
-
 
 def scheme1_driver():
 
@@ -295,7 +235,8 @@ def scheme1_driver():
     print("Time: {}".format(t1-t0))
 
 
-#scheme1_driver()
-print((simulate_driver(20, 'scheme1_1.pickle', 3, numpy.array([100.0, 100.0, 100.0]),
-                1)))
+# Filenames:
+#     'scheme1_1.pickle: means, sigmas for 4-state model with S&P up,
+#                        starting above/below
+
 
