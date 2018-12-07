@@ -20,12 +20,14 @@ TRADER_WORLD_STATE_TRANSITION = array([[0.7, 0, 0.3, 0],
 TRANSITION_PERIOD = 20
 WINDOW_SIZE = 50
 
+# how many decisions we make per run
 NUMBER_OF_PERIODS = 100
 
 # Number of world states
 NUM_WORLD_STATES = 4
 RF_INVESTMENT = [0, 0, 1.6, 1.6]
 
+# Number of training epochs
 NUM_TRAIN_ITER = 20
 
 SUCCESS_THRESHOLD = 0

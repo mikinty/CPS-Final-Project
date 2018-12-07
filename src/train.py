@@ -11,7 +11,7 @@ from RL.schedImprove import schedulerImprove
 
 import pickle
 import sys
-
+from numpy import array_equal
 
 if __name__ == '__main__':
     if (len(sys.argv) < 3):
@@ -37,13 +37,19 @@ if __name__ == '__main__':
         Q = schedulerEvaluate(scheduler, strat)
 
         # Update scheduler with new quality estimates
-        scheduler = schedulerImprove(scheduler, Q)
+        newScheduler = schedulerImprove(scheduler, Q)
 
         pickle_out = open(SCHEDULER_FILE, 'wb')
         
-        pickle.dump(scheduler, pickle_out)
+        pickle.dump(newScheduler, pickle_out)
         pickle_out.close()
 
-        print(scheduler)
+        print(newScheduler)
+
+        if array_equal(newScheduler, scheduler):
+          print('Converged')
+          break
+
+        scheduler = newScheduler
 
     print('Done Training. Saved new scheduler to', SCHEDULER_FILE)
