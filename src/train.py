@@ -32,9 +32,11 @@ if __name__ == '__main__':
         # Update scheduler with new quality estimates
         scheduler = schedulerImprove(scheduler, Q)
 
-    pickle_out = open(SCHEDULER_FILE, 'wb')
-    pickle.dump(scheduler, pickle_out)
-    pickle_out.close()
+        pickle_out = open(SCHEDULER_FILE, 'wb')
+        
+        pickle.dump(scheduler, pickle_out)
+        pickle_out.close()
+
+        print(scheduler)
 
     print('Done Training. Saved new scheduler to', SCHEDULER_FILE)
-    print(scheduler)
