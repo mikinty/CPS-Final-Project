@@ -126,6 +126,6 @@ def simulate_driver(transitions):
     avg_return = numpy.mean(portfolio_returns) * (float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
 
-    sharpe = avg_return / risk
+    sharpe = (avg_return - RISK_FREE_RATE) / risk
 
     return avg_return, risk, sharpe
