@@ -8,7 +8,7 @@ Abhishek Barghava
 from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD
 from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES
 
-from numpy import array, zeros, random, divide, zeros
+from numpy import array, array_equal, zeros, random, divide, zeros
 import multiprocessing as mp
 from functools import partial
 from time import time
@@ -31,15 +31,21 @@ def callSimulation(scheduler, strat, i):
     # Limit to -3 <= sharpe <= 3
     sharpe = max(-3, min(3, sharpe))
 
-    # whether or update R+ or R- 
-    index = 1 if (sharpe < SUCCESS_THRESHOLD) else 0
+    # whether or update R+ or R-
+    if (sharpe < SUCCESS_THRESHOLD):
+        index = 1
+        sharpe = -sharpe
+    else:
+        index = 0
+        
+    # index = 1 if (sharpe < SUCCESS_THRESHOLD) else 0
 
     # Reinforcement feedback
     R = zeros((2, 4, 4))
     for i in range(len(moves) - 1):
         state, action = moves[i:i+2]
 
-        R[index][state][action] += 1
+        R[index][state][action] += sharpe
 
     return R
 
@@ -51,6 +57,8 @@ def schedulerEvaluate(scheduler, strat):
 
     return: New quality estimates for each state
     '''
+
+    # parallel version...idk why it doesn't work
     pool = mp.Pool()
     # number of jobs
     jobs = range(SCHEDULER_TRAIN_ITER)
@@ -61,16 +69,21 @@ def schedulerEvaluate(scheduler, strat):
     # print(R_RES)
     R = sum(R_RES)
 
+    pool.close()
+
     '''
-    R = callSimulation(0)
-    for x in range(SCHEDULER_TRAIN_ITER):
-        R_RES = callSimulation(x)
+    # sequential version
+    R = callSimulation(scheduler, strat, 0)
+    print(strat)
+    for x in range(SCHEDULER_TRAIN_ITER - 1):
+        R_RES = callSimulation(scheduler, strat, x)
 
-        print(R_RES)
+        # print(R_RES)
         R += R_RES
-
+    
     print(R)
     '''
+    # print(sum(sum(sum(R))))
 
     # Update scheduler quality estimates
     # Notice that if we didn't encounter a particular state in 
@@ -88,7 +101,6 @@ def schedulerEvaluate(scheduler, strat):
     '''
 
     Q = divide(R[1], R[0] + R[1], where=(R[0] + R[1])!=0)
-
     print('q', Q)
 
     return Q
