@@ -5,7 +5,7 @@ Michael You
 Abhishek Barghava
 '''
 
-from CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES
+from .CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES
 import numpy as np
 
 # TODO: need to import STATES
@@ -33,8 +33,7 @@ def schedulerImprove(scheduler, Q):
             if a == bestAction:
                 p += 1 - EXPLORATION_RATE
 
-            newScheduler[s][a] = 
-                scheduler[s][a] * (1 - LEARNING_RATE) + p * LEARNING_RATE
+            newScheduler[s][a] = scheduler[s][a] * (1 - LEARNING_RATE) + p * LEARNING_RATE
 
     return newScheduler
 
