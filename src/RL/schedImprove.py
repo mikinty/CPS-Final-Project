@@ -8,8 +8,6 @@ Abhishek Barghava
 from .CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES
 import numpy as np
 
-# TODO: need to import STATES
-
 def schedulerImprove(scheduler, Q):
     '''
     Greedily chooses the best moves for an improved scheduler
@@ -19,10 +17,10 @@ def schedulerImprove(scheduler, Q):
 
     return: New and improved scheduler
     '''
-    newScheduler = np.zeros(NUM_WORLD_STATES, NUM_WORLD_STATES)
+    newScheduler = np.zeros((NUM_WORLD_STATES, NUM_WORLD_STATES))
 
     for s in range(NUM_WORLD_STATES):
-        bestAction = np.argmax(Q)
+        bestAction = np.argmax(Q[s])
 
         totalQ = sum(Q[s])
 

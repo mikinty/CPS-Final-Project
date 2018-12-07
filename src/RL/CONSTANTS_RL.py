@@ -9,7 +9,7 @@ Abhishek Barghava
 SCHEDULER_OPTIMIZE_ITER = 100
 
 # Number of iterations to train the scheduler
-SCHEDULER_TRAIN_ITER = 1000
+SCHEDULER_TRAIN_ITER = 1
 
 # How much exploration we do during RL
 EXPLORATION_RATE = 0.05
