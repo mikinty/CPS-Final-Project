@@ -11,12 +11,10 @@ import time
 import pickle
 import copy
 
-# data file
-DATA_FILE = os.path.expanduser("~/College/Junior/15424_Foundations/Project/data/")
+from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD
 
-# number of trading days in a year
-# this is what annualized volatility is based on
-YEAR_LENGTH = 252
+# data file
+DATA_FILE = os.path.expanduser("./data/")
 
 # get data for specified ticker
 def get_data(ticker):
@@ -238,5 +236,3 @@ def scheme1_driver():
 # Filenames:
 #     'scheme1_1.pickle: means, sigmas for 4-state model with S&P up,
 #                        starting above/below
-
-
