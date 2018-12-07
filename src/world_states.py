@@ -1,0 +1,301 @@
+import numpy
+import math
+import os
+import pandas
+import numpy
+import datetime
+import matplotlib.pyplot as plt
+import random
+import queue
+import time
+import pickle
+import copy
+
+# data file
+DATA_FILE = os.path.expanduser("~/College/Junior/15424_Foundations/Project/data/")
+
+# number of trading days in a year
+# this is what annualized volatility is based on
+YEAR_LENGTH = 252
+
+# get data for specified ticker
+def get_data(ticker):
+    # the filename of the data
+    fname = DATA_FILE + ticker + ".csv"
+
+    # read data from file
+    df = pandas.read_csv(fname)
+
+    # convert date column to datetime
+    df['Date'] = pandas.to_datetime(df['Date'])
+
+    # return the resulting dataframe
+    return df
+
+# get returns for this df
+def get_returns(df):
+    adj_close = df['Adj Close'].values
+    rets = numpy.subtract(numpy.log(adj_close[1:]),
+                          numpy.log(adj_close[:-1]))
+    dates = df['Date'].values
+
+    # account for the first observation's return not being included
+    dates = dates[1:]
+
+    return dates, rets
+
+
+
+def filter_df(df, start, end):
+    df = df[(df['Date'] >= start) & (df['Date'] <= end)]
+    return df
+
+# Scheme 1:
+#     1) S&P goes up, starts above 50 day moving avg
+#     2) S&P goes up, starts below 50 day moving avg
+#     3) S&P goes down, starts above 50 day moving avg
+#     4) S&P goes down, starts below 50 day moving avg
+def compute_world_states_scheme1(transition_period, window_size):
+    # Get S&P data
+    df = get_data("GSPC")
+
+    # List of world state dates represented as (start,end) tuples
+    st1 = list()
+    st2 = list()
+    st3 = list()
+    st4 = list()
+
+    # Filter the df to get data between 2005-2018
+    start = datetime.date(2005,1,1)
+    end = datetime.date(2017,12,31)
+    df = filter_df(df, start, end)
+
+    # Get dates and prices
+    dates = df['Date'].values
+    prices = df['Adj Close'].values
+
+    # Compute 50 day rolling window
+    curr_index = 0
+    sum_window = 0
+    curr_rolling_queue = queue.Queue()
+
+    for i in range(window_size):
+        curr_rolling_queue.put(prices[curr_index])
+        sum_window += prices[curr_index]
+        curr_index += 1
+    curr_avg = sum_window / float(window_size)
+
+    # Now figure out where to add the dates (i.e. assign time periods to
+    # world states
+
+    # the number of days per period
+    iteration_num = 0
+    while(True):
+        #print("On iteration {}, date {}".format(iteration_num, dates[curr_index]))
+
+        # if we don't have enough observations, break out
+        if (curr_index + transition_period >= len(prices)):
+            break
+
+        # determine the world state
+        first_price = prices[curr_index]
+        last_price = prices[curr_index + transition_period - 1]
+
+        # add the dates into the world state
+        if (last_price > first_price):
+            if (first_price > curr_avg):
+                # goes up, starts above avg
+                st1.append((dates[curr_index], dates[curr_index+transition_period-1]))
+            else:
+                st2.append((dates[curr_index], dates[curr_index+transition_period-1]))
+        else:
+            if (first_price > curr_avg):
+                st3.append((dates[curr_index], dates[curr_index+transition_period-1]))
+            else:
+                st4.append((dates[curr_index], dates[curr_index+transition_period-1]))
+
+        # now recompute the rolling average and update curr_index
+        for j in range(transition_period):
+            # remove the oldest price from the queue
+            removed_price = float(curr_rolling_queue.get())
+            # get the previous sum of prices in the queue
+            prev_sum = curr_avg * window_size
+            # get the new sum by removing a price and adding the new price back in
+            new_sum = prev_sum - removed_price + prices[curr_index]
+            # put the new price into the queue
+            curr_rolling_queue.put(prices[curr_index])
+            # compute the new average
+            curr_avg = new_sum / float(window_size)
+            # increment curr_index
+            curr_index += 1
+        iteration_num += 1
+
+    return st1, st2, st3, st4
+
+def get_returns_df(stocks, start, end):
+    returns_dict = dict()
+    for stock in stocks:
+        # get the stock's dataframe
+        stock_df = get_data(stock)
+        stock_df = filter_df(stock_df, start, end)
+
+        # get the returns
+        dates, stock_rets = get_returns(stock_df)
+
+        if (stock == stocks[0]):
+            returns_dict["Date"] = dates
+
+        returns_dict[stock] = stock_rets
+
+    returns_df = pandas.DataFrame(data=returns_dict)
+    return returns_df
+
+# get state-specific returns
+def get_state_returns(state_dates, returns_df):
+    # loop over the date intervals
+    df = pandas.DataFrame()
+
+    for state_date in state_dates:
+        # start and end dates
+        start = state_date[0]
+        end = state_date[1]
+
+        # loop over the relevant dates
+        curr_returns_df = filter_df(returns_df, start, end)
+
+        # add to the dataframe
+        if (state_date == state_dates[0]):
+            df = curr_returns_df
+        else:
+            df = df.append(curr_returns_df, ignore_index=True)
+
+    return df
+
+
+# compute state parameters
+def get_state_params(state_returns):
+
+    means = list()
+    sigmas = list()
+    for state_return in state_returns:
+        curr_mean = numpy.multiply(numpy.mean(state_return, axis=0),
+                                   YEAR_LENGTH)
+        sigma = numpy.multiply(numpy.cov(state_return, rowvar=False),
+                                YEAR_LENGTH)
+        means.append(curr_mean)
+        sigmas.append(sigma)
+    return means, sigmas
+
+
+# simulate correlated gbms
+def simulate(mean, sigma, time_pd, initial):
+
+    # get the cholesky factorization
+    cholesky = numpy.linalg.cholesky(sigma)
+
+    curr_prices = copy.deepcopy(initial)
+
+    num_stocks = len(mean)
+    t = float(1.0) / float(YEAR_LENGTH)
+    sqrt_t = math.sqrt(t)
+
+    # iterate and simulate the correlated GBMs
+    for i in range(time_pd):
+
+        # get the random vector for this time step
+        zs = numpy.random.normal(0.0, 1.0, num_stocks)
+
+        for j in range(num_stocks):
+
+            # get the current price of the stock
+            curr_price = curr_prices[j]
+            curr_mean = mean[j]
+            curr_sigma_sq = sigma[j,j]
+
+            # get row i of the cholesky matrix
+            curr_row = cholesky[j,:]
+
+            # compute the thing in the exponent
+            exponent = (sqrt_t * (numpy.dot(curr_row, zs))) + ((curr_mean - (0.5*curr_sigma_sq))*t)
+
+            new_price = curr_price * math.exp(exponent)
+
+            curr_prices[j] = new_price
+
+    return curr_prices
+
+
+# helper, takes all params as args
+def scheme1_driver_helper(transition_period, window_size, stocks, fname):
+    # get the dates for the states
+
+    state_dates = compute_world_states_scheme1(transition_period,
+                                          window_size)
+
+    # for each state:
+    #     combine returns into a dataframe (per-state dataframe)
+    #     compute the mean and cov matrices of those lists
+    #     this gives us mean vector and covariance matrix for each state
+
+    # get returns
+    start = datetime.date(2005,1,1)
+    end = datetime.date(2017,12,31)
+    returns_df = get_returns_df(stocks, start, end)
+
+    # get returns dataframes on a per-state basis
+    state_returns = list()
+    for state_date in state_dates:
+        curr_st_rets = get_state_returns(state_date, returns_df)
+        curr_st_rets = curr_st_rets[stocks]
+        state_returns.append(numpy.reshape(curr_st_rets.values, (len(curr_st_rets),3)))
+
+    # get mean vectors and covariance matrix
+    means, sigmas = get_state_params(state_returns)
+
+    parameters = (means, sigmas)
+
+    pickle_out = open(fname, 'wb')
+    pickle.dump(parameters, pickle_out)
+    pickle_out.close()
+
+def simulate_driver(transition_period, fname, state_num, prices,
+                    num_iterations):
+
+    pickle_in = open(fname, 'rb')
+    params = pickle.load(pickle_in)
+    pickle_in.close()
+
+    means = params[0]
+    sigmas = params[1]
+
+    new_prices = numpy.zeros(prices.shape)
+
+    for i in range(num_iterations):
+        curr_prices = simulate(means[state_num], sigmas[state_num],
+                               transition_period, prices)
+
+        new_prices = numpy.add(curr_prices, new_prices)
+
+
+    avg_prices = numpy.divide(new_prices, num_iterations)
+    return avg_prices
+
+
+def scheme1_driver():
+
+    transition_period = 20
+    window_size = 50
+    stocks = ["AAPL", "GOOG", "MSFT"]
+
+    t0 = time.time()
+    scheme1_driver_helper(transition_period, window_size, stocks,
+                          fname='scheme1_1.pickle')
+    t1 = time.time()
+
+    print("Time: {}".format(t1-t0))
+
+
+#scheme1_driver()
+print((simulate_driver(20, 'scheme1_1.pickle', 3, numpy.array([100.0, 100.0, 100.0]),
+                1)))
+
