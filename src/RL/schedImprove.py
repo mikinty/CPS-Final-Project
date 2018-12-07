@@ -5,7 +5,7 @@ Michael You
 Abhishek Barghava
 '''
 
-from .CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES
+from .CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES, EPSILON
 import numpy as np
 
 def schedulerImprove(scheduler, Q):
@@ -24,7 +24,13 @@ def schedulerImprove(scheduler, Q):
 
         totalQ = sum(Q[s])
 
+        # don't update. Shouldn't happen often.
+        if totalQ < EPSILON:
+            newScheduler[s] = scheduler[s]
+            continue
+
         for a in range(NUM_WORLD_STATES):
+
             # the probability we are assigning to the action
             p = EXPLORATION_RATE * (Q[s][a] / totalQ)
 

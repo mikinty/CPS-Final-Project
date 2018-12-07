@@ -29,7 +29,6 @@ if __name__ == '__main__':
         # Compute new quality factor
         Q = schedulerEvaluate(scheduler)
 
-        print('improve')
         # Update scheduler with new quality estimates
         scheduler = schedulerImprove(scheduler, Q)
 
