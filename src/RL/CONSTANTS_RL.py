@@ -17,5 +17,8 @@ EXPLORATION_RATE = 0.05
 # How fast we are learning new choices
 LEARNING_RATE = 0.05
 
+# Number of world states
+NUM_WORLD_STATES = 4
+
 # Length of longest path to determine success/fail
 MAX_SAMPLES = 365

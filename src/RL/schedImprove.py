@@ -5,7 +5,8 @@ Michael You
 Abhishek Barghava
 '''
 
-from CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE
+from CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES
+import numpy as np
 
 # TODO: need to import STATES
 
@@ -18,22 +19,22 @@ def schedulerImprove(scheduler, Q):
 
     return: New and improved scheduler
     '''
-    newScheduler = {}
+    newScheduler = np.zeros(NUM_WORLD_STATES, NUM_WORLD_STATES)
 
-    for s in STATES:
-        bestAction = max(Q[s], key=Q[s].get)
+    for s in range(NUM_WORLD_STATES):
+        bestAction = np.argmax(Q)
 
         totalQ = sum(Q[s])
 
-        for a in ACTIONS:
+        for a in range(NUM_WORLD_STATES):
             # the probability we are assigning to the action
             p = EXPLORATION_RATE * (Q[s][a] / totalQ)
 
             if a == bestAction:
                 p += 1 - EXPLORATION_RATE
 
-            newScheduler[(s, a)] = 
-                scheduler[(s, a)] * (1 - LEARNING_RATE) + p * LEARNING_RATE
+            newScheduler[s][a] = 
+                scheduler[s][a] * (1 - LEARNING_RATE) + p * LEARNING_RATE
 
     return newScheduler
 
