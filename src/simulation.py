@@ -4,7 +4,8 @@ import pickle
 import copy
 
 from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS_FNAME, \
-    PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE
+    PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE, \
+    STRATEGY_BUY_HOLD, STRATEGY_SCHEME, STRATEGY_SHORT_DOWN
 
 # simulate correlated gbms
 def simulate(mean, sigma, initial):
@@ -68,21 +69,42 @@ def simulate_driver_scheme1(state_num, init_prices, num_iterations,
     return avg_prices
 
 
-def simulate_driver(transitions):
+pickle_in = open(STRATEGY_BUY_HOLD + '_params.pickle', 'rb')
+BH_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SCHEME + '_params.pickle', 'rb')
+SC_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SHORT_DOWN + '_params.pickle', 'rb')
+SD_params = pickle.load(pickle_in)
+pickle_in.close()
 
+pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
+BH_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SCHEME + '_portfolios.pickle', 'rb')
+SC_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SHORT_DOWN + '_portfolios.pickle', 'rb')
+SD_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+
+def simulate_driver(transitions, strat):
     # get parameters for each world state
-    pickle_in = open(PARAMS_FNAME, 'rb')
-    params = pickle.load(pickle_in)
-    pickle_in.close()
+    if strat == STRATEGY_BUY_HOLD:
+      params = BH_params
+      portfolios = BH_portfolios
+    elif strat == STRATEGY_SCHEME:
+      params = SC_params
+      portfolios = SC_portfolios
+    else:
+      params = SD_params
+      portfolios = SD_portfolios
 
     means = params[0]
     sigmas = params[1]
 
     # get optimal portfolios
-    pickle_in = open(PORTFOLIO_FNAME, 'rb')
-    portfolios = pickle.load(pickle_in)
-    pickle_in.close()
-
     real_ports = portfolios[0]
     optimal_ports = portfolios[1]
 

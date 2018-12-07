@@ -15,8 +15,9 @@ from time import time
 
 from simulation import simulate_driver
 
+
 # Per thread call to orun a single simulation iteration
-def callSimulation(scheduler, i):
+def callSimulation(scheduler, strat, i):
     random.seed()
 
     # generate moves
@@ -25,7 +26,7 @@ def callSimulation(scheduler, i):
         moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
 
     # Run simulation
-    avg_return, risk, sharpe = simulate_driver(moves)
+    avg_return, risk, sharpe = simulate_driver(moves, strat)
     
     # Limit to -3 <= sharpe <= 3
     sharpe = max(-3, min(3, sharpe))
@@ -42,7 +43,7 @@ def callSimulation(scheduler, i):
 
     return R
 
-def schedulerEvaluate(scheduler):
+def schedulerEvaluate(scheduler, strat):
     '''
     Trains the scheduler via RL
 
@@ -50,12 +51,12 @@ def schedulerEvaluate(scheduler):
 
     return: New quality estimates for each state
     '''
+    pool = mp.Pool()
     # number of jobs
     jobs = range(SCHEDULER_TRAIN_ITER)
 
-    CS = partial(callSimulation, scheduler)
+    CS = partial(callSimulation, scheduler, strat)
 
-    pool = mp.Pool()
     R_RES = pool.map(CS, jobs)
     # print(R_RES)
     R = sum(R_RES)
@@ -91,3 +92,4 @@ def schedulerEvaluate(scheduler):
     print('q', Q)
 
     return Q
+

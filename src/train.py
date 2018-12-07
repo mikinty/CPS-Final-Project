@@ -10,10 +10,17 @@ from schedEvaluate import schedulerEvaluate
 from RL.schedImprove import schedulerImprove
 
 import pickle
+import sys
 
-SCHEDULER_FILE = './schedulers/scheduler1.pickle'
 
 if __name__ == '__main__':
+    if (len(sys.argv) < 3):
+        print('Need 2 arguments: STRATEGY SCHEDULER')
+        sys.exit() 
+
+    strat = sys.argv[1]
+    SCHEDULER_FILE = './schedulers/'+ sys.argv[2] + '.pickle'
+
     print('Starting Training on', SCHEDULER_FILE)
 
     # Load scheduler file
@@ -27,7 +34,7 @@ if __name__ == '__main__':
     for i in range(NUM_TRAIN_ITER):
         print('Iteration', i)
         # Compute new quality factor
-        Q = schedulerEvaluate(scheduler)
+        Q = schedulerEvaluate(scheduler, strat)
 
         # Update scheduler with new quality estimates
         scheduler = schedulerImprove(scheduler, Q)

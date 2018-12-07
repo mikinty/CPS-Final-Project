@@ -34,7 +34,11 @@ STOCKS = ["AAPL", "GOOG", "MSFT"]
 
 RISK_FREE_RATE = 0.02
 
-STRATEGY = 'short_down'
+STRATEGY_BUY_HOLD = 'buy_hold'
+STRATEGY_SCHEME = 'scheme1'
+STRATEGY_SHORT_DOWN = 'short_down'
+
+STRATEGY = STRATEGY_SHORT_DOWN
 PARAMS_FNAME = STRATEGY + '_params.pickle'
 RETURNS_FNAME = STRATEGY + '_returns.pickle'
 PORTFOLIO_FNAME = STRATEGY + '_portfolios.pickle'
