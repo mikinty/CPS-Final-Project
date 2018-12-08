@@ -34,23 +34,15 @@ def callSimulation(scheduler, strat, i):
     avg_return, risk, sharpe = simulate_driver(moves, strat)
     
     # Limit to -3 <= sharpe <= 3
-    sharpe = max(-3, min(3, sharpe))
+    sharpe = max(-3, min(3, sharpe)) - SUCCESS_THRESHOLD
 
     # whether or update R+ or R-
-    if (sharpe < SUCCESS_THRESHOLD):
+    if (sharpe < 0):
         index = 1
         sharpe = -sharpe
-        #f=open("stats/moves.txt", "a+")
-        #f.write('MOVES:\n')
-        #for m in moves:
-        ##  f.write(str(m))
-        #  f.write('\n')
-        #f.close()
-        print(moves)
+        # print(moves)
     else:
         index = 0
-        
-    # index = 1 if (sharpe < SUCCESS_THRESHOLD) else 0
 
     # Reinforcement feedback
     R = zeros((2, NUM_WORLD_STATES, NUM_WORLD_STATES))
@@ -104,6 +96,7 @@ def schedulerEvaluate(scheduler, strat):
     Q = divide(R[1], R[0] + R[1], where=(R[0] + R[1])!=0)
     print('q', Q)
 
+    '''
     # How good is our scheduler?
     prob = runMC(scheduler, strat, 100)
 
@@ -112,6 +105,8 @@ def schedulerEvaluate(scheduler, strat):
     stat.append((scheduler, prob))
 
     pickle.dump(stat, open('stats/output.pickle', 'wb'))
+
+    '''
 
     return Q
 
