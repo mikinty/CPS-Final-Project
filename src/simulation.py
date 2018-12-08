@@ -3,8 +3,8 @@ import numpy
 import pickle
 import copy
 
-from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS_FNAME, \
-    PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE
+
+from CONSTANTS_MAIN import *
 
 # simulate correlated gbms
 def simulate(mean, sigma, initial):
@@ -68,21 +68,110 @@ def simulate_driver_scheme1(state_num, init_prices, num_iterations,
     return avg_prices
 
 
-def simulate_driver(transitions):
+pickle_in = open(STRATEGY_BUY_HOLD + '_params.pickle', 'rb')
+BH_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SCHEME + '_params.pickle', 'rb')
+SC_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SHORT_DOWN + '_params.pickle', 'rb')
+SD_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_MVO_RETURNS_WS + '_params.pickle', 'rb')
+MVO_RETURNS_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_1 + '_params.pickle', 'rb')
+STRAT1_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_2 + '_params.pickle', 'rb')
+STRAT2_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_3 + '_params.pickle', 'rb')
+STRAT3_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_4 + '_params.pickle', 'rb')
+STRAT4_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_5 + '_params.pickle', 'rb')
+STRAT5_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_6 + '_params.pickle', 'rb')
+STRAT6_params = pickle.load(pickle_in)
+pickle_in.close()
+
+
+pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
+BH_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SCHEME + '_portfolios.pickle', 'rb')
+SC_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_SHORT_DOWN + '_portfolios.pickle', 'rb')
+SD_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_MVO_RETURNS_WS + '_portfolios.pickle', 'rb')
+MVO_RETURNS_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_1 + '_portfolios.pickle', 'rb')
+STRAT1_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_2 + '_portfolios.pickle', 'rb')
+STRAT2_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_3 + '_portfolios.pickle', 'rb')
+STRAT3_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_4 + '_portfolios.pickle', 'rb')
+STRAT4_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_5 + '_portfolios.pickle', 'rb')
+STRAT5_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_6 + '_portfolios.pickle', 'rb')
+STRAT6_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+
+
+def simulate_driver(transitions, strat):
+    numpy.random.seed()
 
     # get parameters for each world state
-    pickle_in = open(PARAMS_FNAME, 'rb')
-    params = pickle.load(pickle_in)
-    pickle_in.close()
+    if strat == STRATEGY_BUY_HOLD:
+        params = BH_params
+        portfolios = BH_portfolios
+    elif strat == STRATEGY_SCHEME:
+        params = SC_params
+        portfolios = SC_portfolios
+    elif strat == STRATEGY_SHORT_DOWN:
+        params = SD_params
+        portfolios = SD_portfolios
+    elif strat == STRATEGY_MVO_RETURNS_WS:
+        params = MVO_RETURNS_params
+        portfolios = MVO_RETURNS_portfolios
+    elif strat == STRATEGY_1:
+        params = STRAT1_params
+        portfolios = STRAT1_portfolios
+    elif strat == STRATEGY_2:
+        params = STRAT2_params
+        portfolios = STRAT2_portfolios
+    elif strat == STRATEGY_3:
+        params = STRAT3_params
+        portfolios = STRAT3_portfolios
+    elif strat == STRATEGY_4:
+        params = STRAT4_params
+        portfolios = STRAT4_portfolios
+    elif strat == STRATEGY_5:
+        params = STRAT5_params
+        portfolios = STRAT5_portfolios
+    elif strat == STRATEGY_6:
+        params = STRAT6_params
+        portfolios = STRAT6_portfolios
+
 
     means = params[0]
     sigmas = params[1]
 
     # get optimal portfolios
-    pickle_in = open(PORTFOLIO_FNAME, 'rb')
-    portfolios = pickle.load(pickle_in)
-    pickle_in.close()
-
     real_ports = portfolios[0]
     optimal_ports = portfolios[1]
 
@@ -93,6 +182,7 @@ def simulate_driver(transitions):
 
     portfolio_returns = list()
 
+    debug = list()
     for transition in transitions:
         # initialize prev_state
         if prev_state is None:
@@ -103,6 +193,7 @@ def simulate_driver(transitions):
         # prev_state is the state that is ending right now
         # transition is the state that is coming up that we have to simulate for
         curr_portfolio = real_ports[prev_state]
+
         mean = means[transition]
         sigma = sigmas[transition]
 
@@ -118,8 +209,12 @@ def simulate_driver(transitions):
 
         curr_returns = numpy.array(curr_returns)
         port_return = numpy.dot(curr_portfolio, curr_returns) + (1-numpy.sum(curr_portfolio))*RISK_FREE_RATE*(float(TRANSITION_PERIOD) / float(YEAR_LENGTH))
+        debug.append((transition, port_return))
         portfolio_returns.append(port_return)
         prev_prices = curr_prices
+        
+        # remember your previous state
+        prev_state = transition
 
     portfolio_returns = numpy.array(portfolio_returns)
 

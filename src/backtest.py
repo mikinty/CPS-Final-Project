@@ -6,7 +6,9 @@ import pickle
 from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS_FNAME, \
     PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE, STOCKS
 
-from world_states import compute_world_states_scheme1, get_returns_df, filter_df
+#from ws_4_up_below import compute_world_states_scheme1
+from ws_returns import compute_world_states_returns
+from world_state_utils import get_returns_df, filter_df, get_data
 
 
 # compare function to sort state dates
@@ -15,7 +17,7 @@ def sort_state_date_cmp(a):
 
 def backtest_scheme1_helper(state_dates, returns_df, real_ports):
 
-    # reformate state dates into more friendly representation
+    # reformat state dates into more friendly representation
     rf_state_dates = list()
     for i in range(len(state_dates)):
         rf_state_dates += [(i, state_date) for state_date in state_dates[i]]
@@ -54,10 +56,10 @@ def backtest_scheme1_helper(state_dates, returns_df, real_ports):
     return avg_ret, sd_ret, sharpe
 
 
-def backtest_scheme1():
+def backtest(world_states_func):
 
     # get the state dates
-    state_dates = compute_world_states_scheme1()
+    state_dates = world_states_func()
 
     # get the state returns
     pickle_in = open(RETURNS_FNAME, 'rb')
@@ -80,7 +82,7 @@ def backtest_scheme1():
     return backtest_scheme1_helper(state_dates, returns_df, real_ports)
 
 
-print(backtest_scheme1())
+print(backtest(compute_world_states_returns))
 
 
 
