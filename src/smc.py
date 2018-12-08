@@ -16,11 +16,29 @@ import multiprocessing as mp
 from functools import partial
 
 from simulation import simulate_driver
+
+MC_ITER = 10000
+
+# Returns True if the scheduler beats strat
+def callSimulation(scheduler, strat, i):
+    # generate moves
+    moves = [random.randint(NUM_WORLD_STATES)]
+    for i in range(NUMBER_OF_PERIODS - 1):
+        moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
+
+    # Run simulation
+    avg_return, risk, sharpe = simulate_driver(moves, strat)
+
+    # whether or update R+ or R- 
+    return (sharpe < SUCCESS_THRESHOLD)
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print('Need 2 arguments: STRAT SCHEDULER_FILE')
         sys.exit()
 
+    # Parse arguments
     strat = sys.argv[1]
     SCHEDULER_FILE = './schedulers/'+ sys.argv[2] + '.pickle'
 
@@ -30,33 +48,30 @@ if __name__ == '__main__':
     pickle_in = open(SCHEDULER_FILE, 'rb')
     scheduler = pickle.load(pickle_in)
     pickle_in.close()
-
-
+    
+    '''
+    # test optimal scheduler (always chooses bad world state)
     cheduler = array([[0, 0, 1,   0], 
                        [0, 0, 0.5, 0.5],
                        [0, 0, 0.5, 0.5 ],
                        [0, 0, 0,   1]])
+    '''
 
+    # Spawn processes to do task in parallel
+    pool = mp.Pool()
 
-    win = 0
-    total = 0
-    for x in range(100):
-        total += 1
-        moves = [random.randint(NUM_WORLD_STATES)]
-        for i in range(NUMBER_OF_PERIODS - 1):
-            moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
+    # number of jobs
+    jobs = range(MC_ITER)
 
-        # Run simulation
-        avg_return, risk, sharpe = simulate_driver(moves, strat)
-        
-        # Limit to -3 <= sharpe <= 3
-        sharpe = max(-3, min(3, sharpe))
+    CS = partial(callSimulation, scheduler, strat)
 
-        # whether or update R+ or R- 
-        if (sharpe < SUCCESS_THRESHOLD):
-            win += 1
+    WIN_RES = pool.map(CS, jobs)
 
-        print('Current win percentage', win, 'out of', total, ' => ', win/total)
+    NUM_WINS = sum(WIN_RES)
+
+    pool.close()
+
+    print('Scheduler win percentage', NUM_WINS, 'out of', len(jobs), ' => ', NUM_WINS/len(jobs))
 
 
 

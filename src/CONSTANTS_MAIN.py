@@ -21,7 +21,7 @@ TRANSITION_PERIOD = 20
 WINDOW_SIZE = 50
 
 # how many decisions we make per run
-NUMBER_OF_PERIODS = 100
+NUMBER_OF_PERIODS = 1000
 
 # Number of world states
 NUM_WORLD_STATES = 4

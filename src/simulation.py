@@ -90,6 +90,8 @@ SD_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 
 def simulate_driver(transitions, strat):
+    numpy.random.seed()
+
     # get parameters for each world state
     if strat == STRATEGY_BUY_HOLD:
       params = BH_params

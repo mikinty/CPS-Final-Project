@@ -67,7 +67,6 @@ def schedulerEvaluate(scheduler, strat):
     return: New quality estimates for each state
     '''
 
-    '''
     # parallel version...idk why it doesn't work
     pool = mp.Pool()
     # number of jobs
@@ -80,8 +79,8 @@ def schedulerEvaluate(scheduler, strat):
     R = sum(R_RES)
 
     pool.close()
-    '''
 
+    '''
     # sequential version
     R = callSimulation(scheduler, strat, 0)
     print(strat)
@@ -90,6 +89,7 @@ def schedulerEvaluate(scheduler, strat):
 
         # print(R_RES)
         R += R_RES    
+    '''
 
     print (R)
 
