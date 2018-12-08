@@ -44,17 +44,11 @@ def callSimulation(scheduler, strat, i):
     # index = 1 if (sharpe < SUCCESS_THRESHOLD) else 0
 
     # Reinforcement feedback
-    R = zeros((2, 4, 4))
+    R = zeros((2, NUM_WORLD_STATES, NUM_WORLD_STATES))
     for i in range(len(moves) - 1):
         state, action = moves[i:i+2]
 
         R[index][state][action] += sharpe
-
-    '''
-    row_sums = R[index].sum(axis=1)
-    R[index] = divide(R[index], row_sums[:, newaxis], where=row_sums[:, newaxis] != 0)
-    R[index] = R[index] * sharpe
-    '''
 
     return R
 
@@ -98,18 +92,6 @@ def schedulerEvaluate(scheduler, strat):
     # Update scheduler quality estimates
     # Notice that if we didn't encounter a particular state in 
     # our random paths, then scheduler will retain its old value
-    #Q = zeros((NUM_WORLD_STATES, NUM_WORLD_STATES))
-
-    '''
-    for state, action in R:
-        total = (R[0][state][action] + R[1][state][action])
-
-        if total == 0:
-            Q[state][action] = 0
-        else:
-            Q[state][action] = (R[1][state][action] / total)
-    '''
-
     Q = divide(R[1], R[0] + R[1], where=(R[0] + R[1])!=0)
     print('q', Q)
 
