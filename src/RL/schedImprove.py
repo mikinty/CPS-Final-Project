@@ -46,11 +46,8 @@ def schedulerImprove(scheduler, Q):
             if a == bestAction:
                 p += 1 - EXPLORATION_RATE
 
-            # print(p, end=' ')
-
             newScheduler[s][a] = scheduler[s][a] * (1 - LEARNING_RATE) + p * LEARNING_RATE
 
-        # print('new', newScheduler[s])
     return newScheduler
 
 

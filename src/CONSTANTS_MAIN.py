@@ -6,16 +6,16 @@ YEAR_LENGTH = 252
 
 # Valid transitions between world states
 ORIG_TRANSITION = array([[1, 0, 1, 0],
-                                [1, 1, 1, 1],
-                                [1, 1, 1, 1],
-                                [0, 1, 0, 1]])
+                         [1, 1, 1, 1],
+                         [1, 1, 1, 1],
+                         [0, 1, 0, 1]])
 
 # Valid transitions between world states with trader-estimated
 # intuition-based transition probabilities
 FOUR_TRADER_WORLD_STATE_TRANSITION = array([[0.7, 0, 0.3, 0],
-                                [0.2, 0.4, 0.1, 0.3],
-                                [0.3, 0.1, 0.4, 0.2],
-                                [0, 0.4, 0, 0.6]])
+                                            [0.2, 0.4, 0.1, 0.3],
+                                            [0.3, 0.1, 0.4, 0.2],
+                                            [0, 0.4, 0, 0.6]])
 weight_portfolio = False
 
 
@@ -51,7 +51,7 @@ STRATEGY_3 = 'strat3'
 STRATEGY_4 = 'strat4'
 
 
-
+# These parameters define tweakable trading strategy properties
 WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
 NUM_WORLD_STATES = 8
 RF_INVESTMENT = [1, 1.5, 0.5, 0, 0, 0, 0, 0]
