@@ -86,7 +86,12 @@ pickle_in.close()
 pickle_in = open(STRATEGY_2 + '_params.pickle', 'rb')
 STRAT2_params = pickle.load(pickle_in)
 pickle_in.close()
-
+pickle_in = open(STRATEGY_3 + '_params.pickle', 'rb')
+STRAT3_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_4 + '_params.pickle', 'rb')
+STRAT4_params = pickle.load(pickle_in)
+pickle_in.close()
 
 pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
 BH_portfolios = pickle.load(pickle_in)
@@ -105,6 +110,12 @@ STRAT1_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 pickle_in = open(STRATEGY_2 + '_portfolios.pickle', 'rb')
 STRAT2_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_3 + '_portfolios.pickle', 'rb')
+STRAT3_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_4 + '_portfolios.pickle', 'rb')
+STRAT4_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 
 
@@ -130,6 +141,12 @@ def simulate_driver(transitions, strat):
     elif strat == STRATEGY_2:
         params = STRAT2_params
         portfolios = STRAT2_portfolios
+    elif strat == STRATEGY_3:
+        params = STRAT3_params
+        portfolios = STRAT3_portfolios
+    elif strat == STRATEGY_4:
+        params = STRAT4_params
+        portfolios = STRAT4_portfolios
 
 
     means = params[0]
@@ -146,6 +163,7 @@ def simulate_driver(transitions, strat):
 
     portfolio_returns = list()
 
+    debug = list()
     for transition in transitions:
         # initialize prev_state
         if prev_state is None:
@@ -171,10 +189,16 @@ def simulate_driver(transitions, strat):
 
         curr_returns = numpy.array(curr_returns)
         port_return = numpy.dot(curr_portfolio, curr_returns) + (1-numpy.sum(curr_portfolio))*RISK_FREE_RATE*(float(TRANSITION_PERIOD) / float(YEAR_LENGTH))
+        debug.append((transition, port_return))
         portfolio_returns.append(port_return)
         prev_prices = curr_prices
 
     portfolio_returns = numpy.array(portfolio_returns)
+
+    def debug_key(a):
+        return a[1]
+    debug = sorted(debug, key=debug_key)
+    print(debug)
 
     avg_return = numpy.mean(portfolio_returns) * (float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
@@ -184,4 +208,4 @@ def simulate_driver(transitions, strat):
     return avg_return, risk, sharpe
 
 
-print(simulate_driver([1,2,5,1,2,3,4,5,6,7,6,5,5,4,5,6], STRATEGY))
+print(simulate_driver([7, 7, 7, 6, 7, 6, 6, 7, 6, 6, 5, 5, 5, 6, 5, 5, 4, 3, 2, 1, 1, 2, 3, 3, 2, 3, 3, 4, 5, 6, 5, 4, 5, 5, 5, 5, 6, 5, 5, 4, 5, 4, 4, 4, 4, 4, 5, 4, 5, 5, 5, 4, 4, 5, 6, 7, 6, 7, 6, 7, 7, 7, 6, 7, 7, 6, 6, 7, 7, 6, 5, 5, 5, 5, 4, 5, 5, 5, 4, 4, 4, 4, 5, 5, 5, 4, 5, 5, 4, 3, 2, 3, 4, 4, 5, 6, 7, 6, 7, 6, 5, 4, 5, 4, 3, 4, 5, 4, 3, 4, 5, 4, 5, 6, 5, 5, 4, 5, 5, 5, 5, 4, 5, 4, 5, 6, 5, 5, 6, 7, 7, 6, 6, 6, 6, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 3, 4, 4, 3, 4, 3, 4, 5, 5, 4, 3, 2, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 2, 2, 1, 2, 1, 1, 0, 0, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0, 1, 2, 1, 2, 1, 1, 0, 0, 1, 2, 1, 2, 2, 2, 2, 2, 2, 3, 4, 3, 4, 4, 3, 3, 2, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 2, 2, 1, 2, 2, 1, 2, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3, 4, 4, 5, 4, 5, 4, 4, 3, 2, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 3, 2, 3, 3, 4, 4, 3, 3, 4, 5, 4, 3, 2, 1, 2, 1, 1, 2, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 2, 1, 1, 2, 1, 0, 0, 0, 0, 1, 1, 0, 1, 2, 3, 3, 4, 3, 4, 5, 5, 5, 5, 4, 4, 3, 4, 5, 6, 7, 6, 5, 6, 5, 6, 6, 7, 7, 7, 7, 7, 7, 6, 5, 4, 5, 4, 5, 5, 5, 4, 3, 3, 3, 2, 1, 1, 1, 0, 1, 1, 1, 2, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 0, 0, 1, 1, 0, 0, 1, 1, 2, 1, 2, 2, 1, 1, 1, 0, 0, 0, 0, 1, 1, 2, 2, 3, 2, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 4, 4, 3, 4, 5, 4, 4, 4, 3, 2, 3, 4, 3, 3, 3, 2, 2, 3, 3, 4, 5, 4, 3, 2, 2, 1, 2, 2, 2, 2, 1, 0, 1, 2, 1, 0, 1, 0, 1, 1, 1, 1, 2, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 2, 1, 2, 1, 2, 3, 4, 3, 2, 1, 2, 1, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 1, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 2, 2, 2, 3, 2, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 2, 1, 2, 2, 2, 1, 0, 0, 1, 1, 1, 1, 1, 2, 3, 4, 5, 5, 4, 4, 5, 4, 5, 4, 3, 2, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 2, 2, 2, 2, 3, 2, 1, 0, 0, 1, 0, 1, 2, 1, 1, 1, 2, 1, 0, 1, 2, 2, 3, 2, 1, 2, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 2, 2, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 2, 1, 1, 0, 1, 2, 2, 2, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 2, 3, 4, 4, 4, 3, 4, 3, 4, 5, 5, 6, 6, 7, 6, 5, 5, 5, 5, 6, 6, 6, 5, 4, 5, 4, 4, 3, 3, 2, 1, 2, 2, 2, 2, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 2, 3, 2, 2, 1, 1, 1, 0, 1, 1, 1, 2, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], STRATEGY))

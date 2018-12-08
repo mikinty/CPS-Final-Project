@@ -17,7 +17,7 @@ def sort_state_date_cmp(a):
 
 def backtest_scheme1_helper(state_dates, returns_df, real_ports):
 
-    # reformate state dates into more friendly representation
+    # reformat state dates into more friendly representation
     rf_state_dates = list()
     for i in range(len(state_dates)):
         rf_state_dates += [(i, state_date) for state_date in state_dates[i]]

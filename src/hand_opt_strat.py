@@ -1,5 +1,6 @@
 import numpy
 import pickle
+import copy
 
 from CONSTANTS_MAIN import *
 
@@ -25,8 +26,8 @@ def save_hand_opt_portfolios():
         allocations.append(numpy.divide(means[i], numpy.sum(means[i])))
 
     for state_num in range(NUM_WORLD_STATES):
-        curr = numpy.multiply(allocations[i], (1-RF_INVESTMENT[state_num]))
-        optimal_ports[state_num] = curr
+        curr = numpy.multiply(allocations[state_num], (1-RF_INVESTMENT[state_num]))
+        optimal_ports[state_num] = copy.deepcopy(curr)
 
     for state_num in range(NUM_WORLD_STATES):
 
