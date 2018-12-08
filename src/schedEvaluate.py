@@ -14,7 +14,8 @@ from functools import partial
 from time import time
 
 from simulation import simulate_driver
-
+from smc import runMC
+import pickle
 
 # Per thread call to orun a single simulation iteration
 def callSimulation(scheduler, strat, i):
@@ -39,6 +40,13 @@ def callSimulation(scheduler, strat, i):
     if (sharpe < SUCCESS_THRESHOLD):
         index = 1
         sharpe = -sharpe
+        #f=open("stats/moves.txt", "a+")
+        #f.write('MOVES:\n')
+        #for m in moves:
+        ##  f.write(str(m))
+        #  f.write('\n')
+        #f.close()
+        print(moves)
     else:
         index = 0
         
@@ -95,6 +103,15 @@ def schedulerEvaluate(scheduler, strat):
     # our random paths, then scheduler will retain its old value
     Q = divide(R[1], R[0] + R[1], where=(R[0] + R[1])!=0)
     print('q', Q)
+
+    # How good is our scheduler?
+    prob = runMC(scheduler, strat, 100)
+
+    stat = pickle.load(open('stats/output.pickle', 'rb'))
+
+    stat.append((scheduler, prob))
+
+    pickle.dump(stat, open('stats/output.pickle', 'wb'))
 
     return Q
 

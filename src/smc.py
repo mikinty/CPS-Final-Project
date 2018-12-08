@@ -17,7 +17,7 @@ from functools import partial
 
 from simulation import simulate_driver
 
-MC_ITER = 1000
+MC_ITER = 100
 
 # Returns True if the scheduler beats strat
 def callSimulation(scheduler, strat, i):
@@ -32,6 +32,25 @@ def callSimulation(scheduler, strat, i):
     # whether or update R+ or R- 
     return (sharpe < SUCCESS_THRESHOLD)
 
+
+def runMC(scheduler, strat, numIter):
+    # Spawn processes to do task in parallel
+    pool = mp.Pool()
+
+    # number of jobs
+    jobs = range(numIter)
+
+    CS = partial(callSimulation, scheduler, strat)
+
+    WIN_RES = pool.map(CS, jobs)
+
+    NUM_WINS = sum(WIN_RES)
+
+    pool.close()
+
+    print('Scheduler win percentage', NUM_WINS, 'out of', len(jobs), ' => ', NUM_WINS/len(jobs))
+    
+    return NUM_WINS/len(jobs)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -57,22 +76,7 @@ if __name__ == '__main__':
                        [0, 0, 0,   1]])
     '''
 
-    # Spawn processes to do task in parallel
-    pool = mp.Pool()
 
-    # number of jobs
-    jobs = range(MC_ITER)
-
-    CS = partial(callSimulation, scheduler, strat)
-
-    WIN_RES = pool.map(CS, jobs)
-
-    NUM_WINS = sum(WIN_RES)
-
-    pool.close()
-
-    print('Scheduler win percentage', NUM_WINS, 'out of', len(jobs), ' => ', NUM_WINS/len(jobs))
-
-
+    runMC(scheduler, strat, MC_ITER)
 
 

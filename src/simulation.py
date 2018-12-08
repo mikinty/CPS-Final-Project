@@ -93,6 +93,7 @@ pickle_in = open(STRATEGY_4 + '_params.pickle', 'rb')
 STRAT4_params = pickle.load(pickle_in)
 pickle_in.close()
 
+
 pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
 BH_portfolios = pickle.load(pickle_in)
 pickle_in.close()
