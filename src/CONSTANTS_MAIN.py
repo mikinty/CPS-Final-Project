@@ -45,7 +45,7 @@ STRATEGY_BUY_HOLD = 'buy_hold'
 STRATEGY_SCHEME = 'scheme1' # MVO, 4 world states
 STRATEGY_SHORT_DOWN = 'short_down'
 STRATEGY_MVO_RETURNS_WS = 'mvo_returns' # Mvo, 8 world states
-
+STRATEGY_1 = 'strat1'
 
 
 
@@ -53,9 +53,9 @@ STRATEGY_MVO_RETURNS_WS = 'mvo_returns' # Mvo, 8 world states
 WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
 NUM_WORLD_STATES = 8
 RF_INVESTMENT = [0.0]*8
-STOCKS = ["AAPL", "GOOG", "MSFT"]
+STOCKS = ["AAPL", "GOOG", "F", "JNJ", "JPM", "XOM"]
 RISK_FREE_RATE = 0.02
-STRATEGY = STRATEGY_MVO_RETURNS_WS
+STRATEGY = STRATEGY_1
 TRADER_WORLD_STATE_TRANSITION = None
 
 
@@ -82,3 +82,14 @@ PORTFOLIO_FNAME = STRATEGY + '_portfolios.pickle'
 #     (return, std. dev, sharpe ratio)
 #
 #     suggests some degree of mean reversion!!!
+
+# ID: 1
+# Name: strat1
+# WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
+# NUM_WORLD_STATES = 8
+# RF_INVESTMENT = [0.0]*8
+# STOCKS = ["AAPL", "GOOG", "F", "JNJ", "JPM", "XOM"]
+# RISK_FREE_RATE = 0.02
+# STRATEGY = STRATEGY_1
+# TRADER_WORLD_STATE_TRANSITION = None
+

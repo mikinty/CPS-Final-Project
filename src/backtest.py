@@ -6,9 +6,9 @@ import pickle
 from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS_FNAME, \
     PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE, STOCKS
 
-from ws_4_up_below import compute_world_states_scheme1
+#from ws_4_up_below import compute_world_states_scheme1
 from ws_returns import compute_world_states_returns
-from world_states_utils import get_returns_df, filter_df
+from world_state_utils import get_returns_df, filter_df, get_data
 
 
 # compare function to sort state dates
