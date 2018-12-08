@@ -92,6 +92,13 @@ pickle_in.close()
 pickle_in = open(STRATEGY_4 + '_params.pickle', 'rb')
 STRAT4_params = pickle.load(pickle_in)
 pickle_in.close()
+pickle_in = open(STRATEGY_5 + '_params.pickle', 'rb')
+STRAT5_params = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_6 + '_params.pickle', 'rb')
+STRAT6_params = pickle.load(pickle_in)
+pickle_in.close()
+
 
 pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
 BH_portfolios = pickle.load(pickle_in)
@@ -116,6 +123,12 @@ STRAT3_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 pickle_in = open(STRATEGY_4 + '_portfolios.pickle', 'rb')
 STRAT4_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_5 + '_portfolios.pickle', 'rb')
+STRAT5_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_6 + '_portfolios.pickle', 'rb')
+STRAT6_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 
 
@@ -147,6 +160,12 @@ def simulate_driver(transitions, strat):
     elif strat == STRATEGY_4:
         params = STRAT4_params
         portfolios = STRAT4_portfolios
+    elif strat == STRATEGY_5:
+        params = STRAT5_params
+        portfolios = STRAT5_portfolios
+    elif strat == STRATEGY_6:
+        params = STRAT6_params
+        portfolios = STRAT6_portfolios
 
 
     means = params[0]
@@ -198,11 +217,6 @@ def simulate_driver(transitions, strat):
         prev_state = transition
 
     portfolio_returns = numpy.array(portfolio_returns)
-
-    def debug_key(a):
-        return a[1]
-    debug = sorted(debug, key=debug_key)
-    print(debug)
 
     avg_return = numpy.mean(portfolio_returns) * (float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(float(YEAR_LENGTH) / float(TRANSITION_PERIOD))

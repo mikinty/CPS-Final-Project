@@ -9,7 +9,8 @@ from .CONSTANTS_RL import EXPLORATION_RATE, LEARNING_RATE, NUM_WORLD_STATES, EPS
 import numpy as np
 
 def isConverge(Q):
-    return np.array_equal(Q, CONVERGED_Q)
+    return (np.size(Q) == (np.count_nonzero(Q == 0) + np.count_nonzero(Q == 1))) and \
+           (np.count_nonzero(Q.sum(axis=1) == 0) == 0)
 
 def schedulerImprove(scheduler, Q):
     '''
@@ -46,11 +47,8 @@ def schedulerImprove(scheduler, Q):
             if a == bestAction:
                 p += 1 - EXPLORATION_RATE
 
-            # print(p, end=' ')
-
             newScheduler[s][a] = scheduler[s][a] * (1 - LEARNING_RATE) + p * LEARNING_RATE
 
-        # print('new', newScheduler[s])
     return newScheduler
 
 
