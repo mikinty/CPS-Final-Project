@@ -23,7 +23,7 @@ EXPLORATION_CHOICE = 0
 LEARNING_RATE = 0.1
 
 # Number of world states
-NUM_WORLD_STATES = 4
+NUM_WORLD_STATES = 8
 
 # Length of longest path to determine success/fail
 MAX_SAMPLES = 365

@@ -11,20 +11,20 @@ import sys
 from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD
 from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES
 
-from numpy import array, zeros, random, divide, zeros
+from numpy import array, zeros, random, divide, zeros, arange
 import multiprocessing as mp
 from functools import partial
 
 from simulation import simulate_driver
 
-MC_ITER = 10000
+MC_ITER = 1000
 
 # Returns True if the scheduler beats strat
 def callSimulation(scheduler, strat, i):
     # generate moves
     moves = [random.randint(NUM_WORLD_STATES)]
     for i in range(NUMBER_OF_PERIODS - 1):
-        moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
+        moves.append(random.choice(arange(NUM_WORLD_STATES), p=scheduler[moves[i]]))
 
     # Run simulation
     avg_return, risk, sharpe = simulate_driver(moves, strat)

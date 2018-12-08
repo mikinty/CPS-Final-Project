@@ -5,10 +5,10 @@ Michael You
 Abhishek Barghava
 '''
 
-from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD
-from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES, EXPLORATION_CHOICE
+from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD, NUM_WORLD_STATES
+from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, EXPLORATION_CHOICE
 
-from numpy import array, array_equal, zeros, random, divide, nonzero, newaxis
+from numpy import array, array_equal, zeros, random, divide, nonzero, newaxis, arange
 import multiprocessing as mp
 from functools import partial
 from time import time
@@ -22,11 +22,12 @@ def callSimulation(scheduler, strat, i):
 
     # generate moves
     moves = [random.randint(NUM_WORLD_STATES)]
+
     for i in range(NUMBER_OF_PERIODS - 1):
         if random.random() < EXPLORATION_CHOICE:
             moves.append(random.choice(nonzero(scheduler[moves[i]])[0]))
         else:
-            moves.append(random.choice([0, 1, 2, 3], p=scheduler[moves[i]]))
+            moves.append(random.choice(arange(NUM_WORLD_STATES), p=scheduler[moves[i]]))
 
     # Run simulation
     avg_return, risk, sharpe = simulate_driver(moves, strat)
