@@ -12,11 +12,17 @@ def save_hand_opt_portfolios():
 
     allocations = list()
 
+    # Get params
+    pickle_in = open(STRATEGY_2 + '_params.pickle', 'rb')
+    params = pickle.load(pickle_in)
+    pickle_in.close()
+
+    means = params[0]
+
     # Fill in allocations
-
-
-    uni_port = [1.0 / float(len(STOCKS))] * len(STOCKS)
-    uni_port = numpy.array(uni_port)
+    for i in range(NUM_WORLD_STATES):
+        means[i] = numpy.array(means[i])
+        allocations.append(numpy.divide(means[i], numpy.sum(means[i])))
 
     for state_num in range(NUM_WORLD_STATES):
         curr = numpy.multiply(allocations[i], (1-RF_INVESTMENT[state_num]))
