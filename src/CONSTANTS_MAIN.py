@@ -50,7 +50,7 @@ NUMBER_OF_PERIODS = 1000
 NUM_TRAIN_ITER = 20
 
 # sharpe ratio required as a win
-SUCCESS_THRESHOLD = -1.1
+SUCCESS_THRESHOLD = -2
 
 STRATEGY_BUY_HOLD = 'buy_hold'
 STRATEGY_SCHEME = 'scheme1' # MVO, 4 world states

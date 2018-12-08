@@ -7,7 +7,7 @@ Abhishek Barghava
 import sys
 import pickle
 import numpy as np
-from CONSTANTS_MAIN import RET_WORLD_STATE_TRANSITION
+from CONSTANTS_MAIN import RET_WORLD_STATE_TRANSITION, NUM_WORLD_STATES, ORIG_TRANSITION
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -31,8 +31,10 @@ if __name__ == '__main__':
                           [0, 0.1, 0, 0.9]])
     
     '''
-
-    scheduler = RET_WORLD_STATE_TRANSITION
+    if NUM_WORLD_STATES == 4:
+      scheduler = ORIG_TRANSITION
+    else:
+      scheduler = RET_WORLD_STATE_TRANSITION
 
     # Make a uniform scheduler (random)
     row_sums = scheduler.sum(axis=1)	

@@ -17,7 +17,7 @@ from functools import partial
 
 from simulation import simulate_driver
 
-MC_ITER = 100
+MC_ITER = 1000
 
 # Returns True if the scheduler beats strat
 def callSimulation(scheduler, strat, i):

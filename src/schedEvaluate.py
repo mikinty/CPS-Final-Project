@@ -35,7 +35,7 @@ def callSimulation(scheduler, strat, i):
     
     # Limit to -3 <= sharpe <= 3
     sharpe = max(-3, min(3, sharpe)) - SUCCESS_THRESHOLD
-
+    print(sharpe)
     # whether or update R+ or R-
     if (sharpe < 0):
         index = 1
