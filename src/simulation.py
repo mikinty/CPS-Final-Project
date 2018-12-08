@@ -129,3 +129,6 @@ def simulate_driver(transitions):
     sharpe = avg_return / risk
 
     return avg_return, risk, sharpe
+
+
+print(simulate_driver([0,1,0,2,0,3,0,1,0,1]))
