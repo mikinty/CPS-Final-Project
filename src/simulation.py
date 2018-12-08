@@ -200,11 +200,6 @@ def simulate_driver(transitions, strat):
 
     portfolio_returns = numpy.array(portfolio_returns)
 
-    def debug_key(a):
-        return a[1]
-    debug = sorted(debug, key=debug_key)
-    print(debug)
-
     avg_return = numpy.mean(portfolio_returns) * (float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
 
