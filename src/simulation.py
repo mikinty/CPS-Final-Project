@@ -83,6 +83,9 @@ pickle_in.close()
 pickle_in = open(STRATEGY_1 + '_params.pickle', 'rb')
 STRAT1_params = pickle.load(pickle_in)
 pickle_in.close()
+pickle_in = open(STRATEGY_2 + '_params.pickle', 'rb')
+STRAT2_params = pickle.load(pickle_in)
+pickle_in.close()
 
 
 pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
@@ -99,6 +102,9 @@ MVO_RETURNS_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 pickle_in = open(STRATEGY_1 + '_portfolios.pickle', 'rb')
 STRAT1_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+pickle_in = open(STRATEGY_2 + '_portfolios.pickle', 'rb')
+STRAT2_portfolios = pickle.load(pickle_in)
 pickle_in.close()
 
 
@@ -121,6 +127,9 @@ def simulate_driver(transitions, strat):
     elif strat == STRATEGY_1:
         params = STRAT1_params
         portfolios = STRAT1_portfolios
+    elif strat == STRATEGY_2:
+        params = STRAT2_params
+        portfolios = STRAT2_portfolios
 
 
     means = params[0]
@@ -175,4 +184,4 @@ def simulate_driver(transitions, strat):
     return avg_return, risk, sharpe
 
 
-print(simulate_driver([1,2,1,1,2,3,4,5,6,7,6,5,5,4,5,6], STRATEGY))
+print(simulate_driver([1,2,5,1,2,3,4,5,6,7,6,5,5,4,5,6], STRATEGY))
