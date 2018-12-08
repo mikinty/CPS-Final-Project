@@ -118,17 +118,27 @@ def save_optimal_portfolios():
         curr_row = WORLD_STATE_TRANSITION[state_num,:]
 
         curr_portfolio = numpy.zeros(len(mean))
+        num_added = 0
 
         for i in range(len(curr_row)):
             # if we can't transition ignore this state
             if (curr_row[i] == 0):
                 continue
 
+            num_added += 1
+
             # This weighting of portfolios depends on my estimated probabilities of
             # transitioning from one state to another, which are solely based on
             # intuition.
-            curr_add = numpy.multiply(optimal_ports[i], ts[state_num, i])
+            if ts is not None:
+                curr_add = numpy.multiply(optimal_ports[i], ts[state_num, i])
+            else:
+                curr_add = optimal_ports[i]
+
             curr_portfolio = numpy.add(curr_portfolio, curr_add)
+
+        if ts is None:
+            curr_portfolio = numpy.divide(curr_portfolio, num_added)
 
         real_ports[state_num] = curr_portfolio
 

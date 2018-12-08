@@ -7,9 +7,11 @@ if __name__ == '__main__':
         sys.exit()
 
 
-    SCHEDULER_FILE = './schedulers/' + sys.argv[1] + '.pickle'
+    #SCHEDULER_FILE = './schedulers/' + sys.argv[1] + '.pickle'
 
-    pickle_in = open(SCHEDULER_FILE, 'rb')
+    file = './' + sys.argv[1] + '.pickle'
+
+    pickle_in = open(file, 'rb')
     scheduler = pickle.load(pickle_in)
     pickle_in.close()
 

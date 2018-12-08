@@ -5,7 +5,8 @@ import copy
 
 from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, PARAMS_FNAME, RETURNS_FNAME, \
     PORTFOLIO_FNAME, TRADER_WORLD_STATE_TRANSITION, RISK_FREE_RATE, \
-    STRATEGY_BUY_HOLD, STRATEGY_SCHEME, STRATEGY_SHORT_DOWN
+    STRATEGY_BUY_HOLD, STRATEGY_SCHEME, STRATEGY_SHORT_DOWN, STRATEGY_MVO_RETURNS_WS, \
+    STRATEGY
 
 # simulate correlated gbms
 def simulate(mean, sigma, initial):
@@ -78,6 +79,9 @@ pickle_in.close()
 pickle_in = open(STRATEGY_SHORT_DOWN + '_params.pickle', 'rb')
 SD_params = pickle.load(pickle_in)
 pickle_in.close()
+pickle_in = open(STRATEGY_MVO_RETURNS_WS + '_params.pickle', 'rb')
+MVO_RETURNS_params = pickle.load(pickle_in)
+pickle_in.close()
 
 pickle_in = open(STRATEGY_BUY_HOLD + '_portfolios.pickle', 'rb')
 BH_portfolios = pickle.load(pickle_in)
@@ -88,20 +92,28 @@ pickle_in.close()
 pickle_in = open(STRATEGY_SHORT_DOWN + '_portfolios.pickle', 'rb')
 SD_portfolios = pickle.load(pickle_in)
 pickle_in.close()
+pickle_in = open(STRATEGY_MVO_RETURNS_WS + '_portfolios.pickle', 'rb')
+MVO_RETURNS_portfolios = pickle.load(pickle_in)
+pickle_in.close()
+
 
 def simulate_driver(transitions, strat):
     numpy.random.seed()
 
     # get parameters for each world state
     if strat == STRATEGY_BUY_HOLD:
-      params = BH_params
-      portfolios = BH_portfolios
+        params = BH_params
+        portfolios = BH_portfolios
     elif strat == STRATEGY_SCHEME:
-      params = SC_params
-      portfolios = SC_portfolios
-    else:
-      params = SD_params
-      portfolios = SD_portfolios
+        params = SC_params
+        portfolios = SC_portfolios
+    elif strat == STRATEGY_SHORT_DOWN:
+        params = SD_params
+        portfolios = SD_portfolios
+    elif strat == STRATEGY_MVO_RETURNS_WS:
+        params = MVO_RETURNS_params
+        portfolios = MVO_RETURNS_portfolios
+
 
     means = params[0]
     sigmas = params[1]
@@ -155,4 +167,4 @@ def simulate_driver(transitions, strat):
     return avg_return, risk, sharpe
 
 
-print(simulate_driver([0,1,0,2,0,3,0,1,0,1]))
+print(simulate_driver([7,7,7,1,0,7,7,7], STRATEGY))

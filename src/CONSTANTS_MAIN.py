@@ -5,17 +5,30 @@ from numpy import array
 YEAR_LENGTH = 252
 
 # Valid transitions between world states
-WORLD_STATE_TRANSITION = array([[1, 0, 1, 0],
+ORIG_TRANSITION = array([[1, 0, 1, 0],
                                 [1, 1, 1, 1],
                                 [1, 1, 1, 1],
                                 [0, 1, 0, 1]])
 
 # Valid transitions between world states with trader-estimated
 # intuition-based transition probabilities
-TRADER_WORLD_STATE_TRANSITION = array([[0.7, 0, 0.3, 0],
+FOUR_TRADER_WORLD_STATE_TRANSITION = array([[0.7, 0, 0.3, 0],
                                 [0.2, 0.4, 0.1, 0.3],
                                 [0.3, 0.1, 0.4, 0.2],
                                 [0, 0.4, 0, 0.6]])
+weight_portfolio = False
+
+
+# Valid transitions between world states
+RET_WORLD_STATE_TRANSITION = array([[1,1,0,0,0,0,0,0],
+                                    [1,1,1,0,0,0,0,0],
+                                    [0,1,1,1,0,0,0,0],
+                                    [0,0,1,1,1,0,0,0],
+                                    [0,0,0,1,1,1,0,0],
+                                    [0,0,0,0,1,1,1,0],
+                                    [0,0,0,0,0,1,1,1],
+                                    [0,0,0,0,0,0,1,1]])
+
 
 TRANSITION_PERIOD = 20
 WINDOW_SIZE = 50
@@ -23,24 +36,31 @@ WINDOW_SIZE = 50
 # how many decisions we make per run
 NUMBER_OF_PERIODS = 1000
 
-# Number of world states
-NUM_WORLD_STATES = 4
-RF_INVESTMENT = [0, 0, 1.6, 1.6]
-
 # Number of training epochs
 NUM_TRAIN_ITER = 20
 
 SUCCESS_THRESHOLD = 0
 
-STOCKS = ["AAPL", "GOOG", "MSFT"]
-
-RISK_FREE_RATE = 0.02
-
 STRATEGY_BUY_HOLD = 'buy_hold'
-STRATEGY_SCHEME = 'scheme1'
+STRATEGY_SCHEME = 'scheme1' # MVO, 4 world states
 STRATEGY_SHORT_DOWN = 'short_down'
+STRATEGY_MVO_RETURNS_WS = 'mvo_returns' # Mvo, 8 world states
 
-STRATEGY = STRATEGY_SHORT_DOWN
+
+
+
+
+WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
+NUM_WORLD_STATES = 8
+RF_INVESTMENT = [0.0]*8
+STOCKS = ["AAPL", "GOOG", "MSFT"]
+RISK_FREE_RATE = 0.02
+STRATEGY = STRATEGY_MVO_RETURNS_WS
+TRADER_WORLD_STATE_TRANSITION = None
+
+
+
+
 PARAMS_FNAME = STRATEGY + '_params.pickle'
 RETURNS_FNAME = STRATEGY + '_returns.pickle'
 PORTFOLIO_FNAME = STRATEGY + '_portfolios.pickle'
