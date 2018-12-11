@@ -1,5 +1,6 @@
 import pickle
 import sys
+import numpy as np
 
 if __name__ == '__main__':
     if (len(sys.argv) < 2):
@@ -16,4 +17,5 @@ if __name__ == '__main__':
     pickle_in.close()
 
     print('Current Scheduler')
+    np.set_printoptions(precision=2)
     print(scheduler)

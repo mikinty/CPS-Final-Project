@@ -14,7 +14,7 @@ SCHEDULER_OPTIMIZE_ITER = 100
 SCHEDULER_TRAIN_ITER = 25
 
 # number of times to run the simulation each iteration
-SIM_TRAIN_ITER = 1
+SIM_TRAIN_ITER = 5
 
 # How much exploration we do during RL
 EXPLORATION_RATE = 0.05
