@@ -62,6 +62,7 @@ STRATEGY_3 = 'strat3'
 STRATEGY_4 = 'strat4'
 STRATEGY_5 = 'strat5'
 STRATEGY_6 = 'strat6'
+STRATEGY_7 = 'strat7'
 
 
 # These parameters define tweakable trading strategy properties
