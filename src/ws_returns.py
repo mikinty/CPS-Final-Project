@@ -6,8 +6,7 @@ import queue
 import time
 import pickle
 
-from CONSTANTS_MAIN import YEAR_LENGTH, TRANSITION_PERIOD, WINDOW_SIZE, STOCKS, \
-    PARAMS_FNAME, RETURNS_FNAME, NUM_WORLD_STATES
+from CONSTANTS_MAIN import *
 
 from world_state_utils import get_data, filter_df, get_returns_df, get_state_returns, \
     get_state_params
@@ -25,8 +24,8 @@ def compute_world_states_returns():
         states_dates.append(list())
 
     # Filter the df to get data between 2005-2018
-    start = datetime.date(2005,1,1)
-    end = datetime.date(2017,12,31)
+    start = START_DATE
+    end = END_DATE
 
     # Get S&P500 returns
     returns_df = get_returns_df(["GSPC"], start, end)
@@ -92,7 +91,7 @@ def returns_driver_helper(params_fname, returns_fname):
     # get returns
     stocks = STOCKS
     start = datetime.date(2005,1,1)
-    end = datetime.date(2017,12,31)
+    end = datetime.date(2018,11,30)
     returns_df = get_returns_df(stocks, start, end)
 
     # get returns dataframes on a per-state basis

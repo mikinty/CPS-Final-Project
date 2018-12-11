@@ -7,7 +7,7 @@ from CONSTANTS_MAIN import *
 
 #from ws_4_up_below import compute_world_states_scheme1
 from ws_returns import compute_world_states_returns
-from world_state_utils import get_returns_df, filter_df, get_data
+from world_state_utils import get_returns_df, filter_df, get_data, get_price_df
 
 from dynamic_strats import mvo_optimal_strat, buy_and_hold_strat, long_short_strat, long_short_strat_improved
 
@@ -19,16 +19,28 @@ def sort_state_date_cmp(a):
 
 def plot_many(dates, returns_list):
 
+    #sp = get_returns_df(['GSPC'], dates[0], dates[len(dates)-1])
+    #sp = sp[sp['Date'].isin(dates)]
+
+    sp = get_price_df(['GSPC'], dates[0], dates[len(dates)-1])
+    sp = sp[sp['Date'].isin(dates)]
 
     prices_bh = [100.0]
     prices = [100.0]
     prices_imp = [100.0]
+    prices_sp = [100.0]
 
     returns_bh = returns_list[0]
     returns = returns_list[1]
     returns_imp = returns_list[2]
 
-    curr_price_bh, curr_price, curr_price_imp = 100.0, 100.0, 100.0
+    prices_sp = sp['GSPC'].values
+    first_price = prices_sp[0]
+    prices_sp = numpy.divide(prices_sp, first_price / 100.0)
+
+    #print(sp)
+    #exit(1)
+    curr_price_bh, curr_price, curr_price_imp, curr_price_sp = 100.0, 100.0, 100.0, 100.0
 
     for i in range(len(returns)):
         curr_price_bh = curr_price_bh * math.exp(returns_bh[i])
@@ -47,8 +59,9 @@ def plot_many(dates, returns_list):
     plt.plot(dates, prices_bh, label="Buy and Hold")
     plt.plot(dates, prices, color="C2", label="Long Short")
     plt.plot(dates, prices_imp, color="C3", label="Long-Short Scheduler-Improved")
+    plt.plot(dates, prices_sp, color="C4", label="S&P 500 Adjusted Price")
 
-    plt.title('Strategy Backtest, 2005-2017')
+    plt.title('Strategy Backtest, Jan 2005 - Dec 2018')
 
     #ax.legend(loc=2)
     #ax2.legend(loc=4)
@@ -75,9 +88,9 @@ def plot_returns(dates, returns):
 
 def backtest_scheme1_helper(state_dates, returns_df, port_func):
 
-    pickle_in = open(STRATEGY + '_returns.pickle', 'rb')
-    state_returns = pickle.load(pickle_in)
-    pickle_in.close()
+    #pickle_in = open(STRATEGY + '_returns.pickle', 'rb')
+    #state_returns = pickle.load(pickle_in)
+    #pickle_in.close()
 
     # reformat state dates into more friendly representation
     rf_state_dates = list()
@@ -145,8 +158,10 @@ def backtest(world_states_func, port_func):
 
     # get returns
     stocks = STOCKS
-    start = datetime.date(2005,1,1)
-    end = datetime.date(2017,12,31)
+
+    start = START_DATE
+    end = END_DATE
+
     returns_df = get_returns_df(stocks, start, end)
 
     return backtest_scheme1_helper(state_dates, returns_df, port_func)
@@ -157,4 +172,5 @@ avg_ret, sd_ret, sharpe, dates_bh, returns_bh = backtest(compute_world_states_re
 avg_ret, sd_ret, sharpe, dates, returns = backtest(compute_world_states_returns, long_short_strat)
 avg_ret, sd_ret, sharpe, dates_imp, returns_imp = backtest(compute_world_states_returns, long_short_strat_improved)
 
+#print(returns_bh)
 plot_many(dates, [returns_bh, returns, returns_imp])

@@ -75,6 +75,22 @@ def get_returns_df(stocks, start, end):
     returns_df = pandas.DataFrame(data=returns_dict)
     return returns_df
 
+def get_price_df(stocks, start, end):
+    prices_dict = dict()
+    for stock in stocks:
+        # get the stock's dataframe
+        stock_df = get_data(stock)
+        stock_df = filter_df(stock_df, start, end)
+
+        if (stock == stocks[0]):
+            dates = stock_df['Date'].values
+            prices_dict["Date"] = dates
+
+        prices_dict[stock] = stock_df['Adj Close'].values
+
+    prices_df = pandas.DataFrame(data=prices_dict)
+    return prices_df
+
 
 
 # get state-specific returns
