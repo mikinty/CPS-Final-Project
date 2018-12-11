@@ -11,7 +11,10 @@ from numpy import array
 SCHEDULER_OPTIMIZE_ITER = 100
 
 # Number of iterations to train the scheduler
-SCHEDULER_TRAIN_ITER = 500
+SCHEDULER_TRAIN_ITER = 25
+
+# number of times to run the simulation each iteration
+SIM_TRAIN_ITER = 1
 
 # How much exploration we do during RL
 EXPLORATION_RATE = 0.05

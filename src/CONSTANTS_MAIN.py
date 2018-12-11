@@ -44,13 +44,13 @@ TRANSITION_PERIOD = 20
 WINDOW_SIZE = 50
 
 # how many decisions we make per run
-NUMBER_OF_PERIODS = 1000
+NUMBER_OF_PERIODS = 100
 
 # Number of training epochs
 NUM_TRAIN_ITER = 20
 
 # sharpe ratio required as a win
-SUCCESS_THRESHOLD = -2
+SUCCESS_THRESHOLD = 0
 
 STRATEGY_BUY_HOLD = 'buy_hold'
 STRATEGY_SCHEME = 'scheme1' # MVO, 4 world states
