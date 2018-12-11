@@ -238,6 +238,9 @@ def simulate_driver(transitions, strat, port_func):
         port_return = numpy.dot(curr_portfolio, curr_returns) + (
                     1 - numpy.sum(curr_portfolio)) * RISK_FREE_RATE * (
                                   float(TRANSITION_PERIOD) / float(YEAR_LENGTH))
+        #print(curr_portfolio)
+        #print(curr_returns)
+        #print(port_return)
         debug.append((transition, port_return))
         portfolio_returns.append(port_return)
         prev_prices = curr_prices
@@ -247,6 +250,7 @@ def simulate_driver(transitions, strat, port_func):
 
     portfolio_returns = numpy.array(portfolio_returns)
     #print(portfolio_returns)
+
     avg_return = numpy.mean(portfolio_returns) * (
                 float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(
@@ -259,15 +263,17 @@ def simulate_driver(transitions, strat, port_func):
 
     return avg_return, risk, sharpe
 
-# x = 0
-# y = 0
-# z = 0
-# for i in range(10):
-#     a = simulate_driver([0,1,2,1,2,3,2,3,4,5,6,7,6,4,5,4,5,6,5,4,3,2,4,3,4,3,3,3,3,2,3], STRATEGY, long_short_strat)
-#     x += a[0]
-#     y += a[1]
-#     z += a[2]
-#
-# print(x / 10.0)
-# print(y / 10.0)
-# print(z / 10.0)
+x = 0
+y = 0
+z = 0
+for i in range(10):
+    print(i)
+    a = simulate_driver([3, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 2, 3, 2, 3, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 3, 2, 3, 3, 3, 3, 2, 2, 2, 2, 3, 2, 2, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 2, 3, 2, 2, 2, 2, 3, 3, 2, 3, 2, 3, 2, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 3, 2, 2, 2, 2, 2],
+                        STRATEGY, long_short_strat)
+    x += a[0]
+    y += a[1]
+    z += a[2]
+
+print(x / 10.0)
+print(y / 10.0)
+print(z / 10.0)
