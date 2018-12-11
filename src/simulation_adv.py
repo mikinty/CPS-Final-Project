@@ -246,14 +246,28 @@ def simulate_driver(transitions, strat, port_func):
         prev_state = transition
 
     portfolio_returns = numpy.array(portfolio_returns)
-
+    #print(portfolio_returns)
     avg_return = numpy.mean(portfolio_returns) * (
                 float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
     risk = numpy.std(portfolio_returns) * math.sqrt(
         float(YEAR_LENGTH) / float(TRANSITION_PERIOD))
 
     sharpe = (avg_return - RISK_FREE_RATE) / risk
+    if (numpy.isnan(sharpe)):
+        print(risk)
+        sharpe = 0.0
 
     return avg_return, risk, sharpe
 
-#print(simulate_driver([0,3,5,7,7,7,5,6,7], STRATEGY, long_short_strat))
+# x = 0
+# y = 0
+# z = 0
+# for i in range(10):
+#     a = simulate_driver([0,1,2,1,2,3,2,3,4,5,6,7,6,4,5,4,5,6,5,4,3,2,4,3,4,3,3,3,3,2,3], STRATEGY, long_short_strat)
+#     x += a[0]
+#     y += a[1]
+#     z += a[2]
+#
+# print(x / 10.0)
+# print(y / 10.0)
+# print(z / 10.0)
