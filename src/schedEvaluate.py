@@ -19,7 +19,7 @@ from smc import runMC
 import pickle
 
 # strategy to use
-STRAT = buy_and_hold_strat
+STRAT = long_short_strat
 
 # Per thread call to orun a single simulation iteration
 def callSimulation(scheduler, strat, i):
@@ -42,14 +42,16 @@ def callSimulation(scheduler, strat, i):
     
     sharpe = sharpe / SIM_TRAIN_ITER
 
+    print(sharpe)
+
     # Limit to -3 <= sharpe <= 3
-    sharpe = max(-3, min(3, sharpe)) - SUCCESS_THRESHOLD
+    sharpe = sharpe - SUCCESS_THRESHOLD
     # print(sharpe)
     # whether or update R+ or R-
     if (sharpe < 0):
         index = 1
         sharpe = -sharpe
-        # print(moves)
+        print(moves)
     else:
         index = 0
 
