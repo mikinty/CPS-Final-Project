@@ -72,6 +72,7 @@ def compute_world_states_returns():
             states_dates[i].append(all_data[curr_index][1])
             curr_index += 1
 
+    # list of lists
     return states_dates
 
 
@@ -110,6 +111,7 @@ def returns_driver_helper(params_fname, returns_fname):
     pickle.dump(parameters, pickle_out)
     pickle_out.close()
 
+    # list of matrices
     pickle_out = open(returns_fname, 'wb')
     pickle.dump(state_returns, pickle_out)
     pickle_out.close()

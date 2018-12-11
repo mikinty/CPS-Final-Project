@@ -67,7 +67,7 @@ STRATEGY_6 = 'strat6'
 # These parameters define tweakable trading strategy properties
 WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
 NUM_WORLD_STATES = 8
-RF_INVESTMENT = [1, 1, 1, 0, 0, 0, 0, 0]
+RF_INVESTMENT = [0, 0, 0, 0, 0, 0, 0, 0]
 STOCKS = ["AAPL", "F", "JNJ", "JPM", "XOM"]
 RISK_FREE_RATE = 0.02
 STRATEGY = STRATEGY_5
