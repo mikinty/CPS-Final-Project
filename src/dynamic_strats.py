@@ -74,8 +74,10 @@ def long_short_strat(returns_df, max_date, curr_state_end, prev_port):
 
     port = list()
 
-    window_rev = 2 * 30
-    window_mom = 2 * 10
+    window_rev = 60
+    window_mom = 20
+    #window_rev = 60
+    #window_mom = 30
 
     returns_df = filter_df(returns_df, None, max_date)
 
@@ -97,12 +99,21 @@ def long_short_strat(returns_df, max_date, curr_state_end, prev_port):
     rev_mean = numpy.mean(rev_returns_mat, axis=0)
     mom_mean = numpy.mean(mom_returns_mat, axis=0)
 
-    if (numpy.sum(rev_mean) < 0 and numpy.sum(mom_mean) > 0):
+    #if (numpy.sum(rev_mean) < 0 and numpy.sum(mom_mean) > 0):
+    #    for i in range(num_stocks):
+    #        port.append(1.0 / float(num_stocks))
+    #elif (numpy.sum(rev_mean) > 0 and numpy.sum(mom_mean) < 0):
+    #    for i in range(num_stocks):
+    #        port.append(-1.0 / float(num_stocks))
+    #else:
+    #    for i in range(num_stocks):
+    #        port.append(0.0)
+    if (curr_state_end <= 2):
         for i in range(num_stocks):
-            port.append(1.0 / float(num_stocks))
-    elif (numpy.sum(rev_mean) > 0 and numpy.sum(mom_mean) < 0):
+            port.append(-1.0 / num_stocks)
+    elif (curr_state_end >= 5):
         for i in range(num_stocks):
-            port.append(-1.0 / float(num_stocks))
+            port.append(1.0 / num_stocks)
     else:
         for i in range(num_stocks):
             port.append(0.0)
