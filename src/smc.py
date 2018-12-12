@@ -9,15 +9,16 @@ import pickle
 import sys
 
 from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD
-from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES
+from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, NUM_WORLD_STATES, SIM_TRAIN_ITER 
 
 from numpy import array, zeros, random, divide, zeros, arange
 import multiprocessing as mp
 from functools import partial
 
-from simulation import simulate_driver
+from simulation_adv import simulate_driver
+from dynamic_strats import long_short_strat
 
-MC_ITER = 1000
+MC_ITER = 100
 
 # Returns True if the scheduler beats strat
 def callSimulation(scheduler, strat, i):
@@ -26,8 +27,17 @@ def callSimulation(scheduler, strat, i):
     for i in range(NUMBER_OF_PERIODS - 1):
         moves.append(random.choice(arange(NUM_WORLD_STATES), p=scheduler[moves[i]]))
 
+    numSim = SIM_TRAIN_ITER
+
+    sharpe = 0
     # Run simulation
-    avg_return, risk, sharpe = simulate_driver(moves, strat)
+    for x in range(numSim):
+        avg_return, risk, tsharpe = simulate_driver(moves, strat, long_short_strat)
+        sharpe += tsharpe
+
+    sharpe = sharpe / numSim
+
+    print(sharpe < SUCCESS_THRESHOLD, sharpe, i)
 
     # whether or update R+ or R- 
     return (sharpe < SUCCESS_THRESHOLD)

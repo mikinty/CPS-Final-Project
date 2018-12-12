@@ -39,9 +39,22 @@ def get_returns(df):
     return dates, rets
 
 
+# if its not a df, make it a df
+def is_df(df):
+    if isinstance(df, pandas.DataFrame):
+        return True
+    return False
+
 
 def filter_df(df, start, end):
-    df = df[(df['Date'] >= start) & (df['Date'] <= end)]
+    if start is None and end is None:
+        pass
+    elif start is None:
+        df = df[df['Date'] <= end]
+    elif end is None:
+        df = df[df['Date'] >= start]
+    else:
+        df = df[(df['Date'] >= start) & (df['Date'] <= end)]
     return df
 
 def get_returns_df(stocks, start, end):
@@ -62,12 +75,28 @@ def get_returns_df(stocks, start, end):
     returns_df = pandas.DataFrame(data=returns_dict)
     return returns_df
 
+def get_price_df(stocks, start, end):
+    prices_dict = dict()
+    for stock in stocks:
+        # get the stock's dataframe
+        stock_df = get_data(stock)
+        stock_df = filter_df(stock_df, start, end)
+
+        if (stock == stocks[0]):
+            dates = stock_df['Date'].values
+            prices_dict["Date"] = dates
+
+        prices_dict[stock] = stock_df['Adj Close'].values
+
+    prices_df = pandas.DataFrame(data=prices_dict)
+    return prices_df
+
 
 
 # get state-specific returns
 def get_state_returns(state_dates, returns_df):
     # loop over the date intervals
-    df = pandas.DataFrame()
+    df = None
 
     for state_date in state_dates:
         # start and end dates
@@ -77,8 +106,11 @@ def get_state_returns(state_dates, returns_df):
         # loop over the relevant dates
         curr_returns_df = filter_df(returns_df, start, end)
 
+        if (len(curr_returns_df) == 0):
+            return None
+
         # add to the dataframe
-        if (state_date == state_dates[0]):
+        if df is None:
             df = curr_returns_df
         else:
             df = df.append(curr_returns_df, ignore_index=True)

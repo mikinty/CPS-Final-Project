@@ -1,4 +1,5 @@
 from numpy import array
+import datetime
 
 # number of trading days in a year
 # this is what annualized volatility is based on
@@ -44,13 +45,14 @@ TRANSITION_PERIOD = 20
 WINDOW_SIZE = 50
 
 # how many decisions we make per run
-NUMBER_OF_PERIODS = 1000
+NUMBER_OF_PERIODS = 100
 
 # Number of training epochs
 NUM_TRAIN_ITER = 20
 
 # sharpe ratio required as a win
-SUCCESS_THRESHOLD = -2
+SUCCESS_THRESHOLD = 0
+
 
 STRATEGY_BUY_HOLD = 'buy_hold'
 STRATEGY_SCHEME = 'scheme1' # MVO, 4 world states
@@ -62,15 +64,18 @@ STRATEGY_3 = 'strat3'
 STRATEGY_4 = 'strat4'
 STRATEGY_5 = 'strat5'
 STRATEGY_6 = 'strat6'
-
+STRATEGY_7 = 'strat7'
+STRATEGY_8 = 'strat8'
 
 # These parameters define tweakable trading strategy properties
+START_DATE = datetime.date(2005,1,1)
+END_DATE = datetime.date(2018,12,3)
 WORLD_STATE_TRANSITION = RET_WORLD_STATE_TRANSITION
 NUM_WORLD_STATES = 8
-RF_INVESTMENT = [1, 1, 1, 0, 0, 0, 0, 0]
+RF_INVESTMENT = [0, 0, 0, 0, 0, 0, 0, 0]
 STOCKS = ["AAPL", "F", "JNJ", "JPM", "XOM"]
 RISK_FREE_RATE = 0.02
-STRATEGY = STRATEGY_5
+STRATEGY = STRATEGY_8
 TRADER_WORLD_STATE_TRANSITION = EIGHT_TRADER_WORLD_STATE_TRANSITION
 
 

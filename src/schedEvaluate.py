@@ -6,16 +6,20 @@ Abhishek Barghava
 '''
 
 from CONSTANTS_MAIN import NUMBER_OF_PERIODS, SUCCESS_THRESHOLD, NUM_WORLD_STATES
-from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, EXPLORATION_CHOICE
+from RL.CONSTANTS_RL import SCHEDULER_TRAIN_ITER, EXPLORATION_CHOICE, SIM_TRAIN_ITER 
 
 from numpy import array, array_equal, zeros, random, divide, nonzero, newaxis, arange
 import multiprocessing as mp
 from functools import partial
 from time import time
 
-from simulation import simulate_driver
+from simulation_adv import simulate_driver
+from dynamic_strats import mvo_optimal_strat, buy_and_hold_strat, long_short_strat
 from smc import runMC
 import pickle
+
+# strategy to use
+STRAT = long_short_strat
 
 # Per thread call to orun a single simulation iteration
 def callSimulation(scheduler, strat, i):
@@ -30,17 +34,24 @@ def callSimulation(scheduler, strat, i):
         else:
             moves.append(random.choice(arange(NUM_WORLD_STATES), p=scheduler[moves[i]]))
 
+    sharpe = 0
     # Run simulation
-    avg_return, risk, sharpe = simulate_driver(moves, strat)
+    for x in range(SIM_TRAIN_ITER):
+        avg_return, risk, tempSharpe = simulate_driver(moves, strat, STRAT)
+        sharpe += tempSharpe
     
-    # Limit to -3 <= sharpe <= 3
-    sharpe = max(-3, min(3, sharpe)) - SUCCESS_THRESHOLD
+    sharpe = sharpe / SIM_TRAIN_ITER
+
     print(sharpe)
+
+    # Limit to -3 <= sharpe <= 3
+    sharpe = sharpe - SUCCESS_THRESHOLD
+    # print(sharpe)
     # whether or update R+ or R-
     if (sharpe < 0):
         index = 1
         sharpe = -sharpe
-        # print(moves)
+        print(moves)
     else:
         index = 0
 
